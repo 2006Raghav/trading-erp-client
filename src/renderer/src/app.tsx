@@ -8,9 +8,9 @@ import { ProtectedRoute } from './modules/auth/ProtectedRoute'
 import { AppShell } from './components/layout/AppShell'
 import { LoginPage } from './modules/auth/LoginPage'
 import { DashboardPage } from './modules/dashboard/DashboardPage'
-// import { BuyersPage } from './modules/buyers/BuyersPage'
+import { BuyersPage } from './modules/buyers/buyersPage'
 // import { SellersPage } from './modules/sellers/SellersPage'
-// import { ProductsPage } from './modules/products/ProductsPage'
+import { ProductsPage } from './modules/products/productsPage'
 // import { UsersPage } from './modules/users/UsersPage'
 
 export default function App() {
@@ -38,7 +38,7 @@ export default function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
 
             {/* Module routes: ProtectedRoute with `require` also checks role permission */}
-            {/* <Route
+            <Route
               path="/buyers/*"
               element={
                 <ProtectedRoute require="buyers">
@@ -46,7 +46,7 @@ export default function App() {
                   <BuyersPage />{' '}
                 </ProtectedRoute>
               }
-            /> */}
+            />
             {/* <Route
               path="/sellers/*"
               element={
@@ -56,14 +56,14 @@ export default function App() {
                 </ProtectedRoute>
               }
             /> */}
-            {/* <Route
+            <Route
               path="/products/*"
               element={
                 <ProtectedRoute require="products">
                   <ProductsPage />
                 </ProtectedRoute>
-              } */}
-            {/* // /> */}
+              }
+            />
             {/* // <Route
             //   path="/users/*"
             //   element={
