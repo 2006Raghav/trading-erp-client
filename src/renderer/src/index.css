@@ -1,9 +1,4 @@
-/* Tailwind base layers */
-/* stylelint-disable at-rule-no-unknown */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-/* stylelint-enable at-rule-no-unknown */
+@import 'tailwindcss';
 
 /* Custom scrollbar — visible in the sidebar nav and long tables */
 ::-webkit-scrollbar {

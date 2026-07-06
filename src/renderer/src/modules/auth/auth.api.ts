@@ -1,5 +1,4 @@
 import { api } from '../../lib/api'
-import { tokenStorage } from '../../platform'
 import type { User } from '../../lib/types'
 
 export interface LoginResponse {
@@ -20,7 +19,7 @@ export const authApi = {
    * The token is stored by AuthContext after a successful call.
    */
   login: (username: string, password: string) =>
-    api.request<LoginResponse>('POST', '/api/auth/login', { username, password }),
+    api.request<LoginResponse>('POST', '/api/v1/auth/login', { username, password }),
 
   /**
    * POST /api/auth/logout
