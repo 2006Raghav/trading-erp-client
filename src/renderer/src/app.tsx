@@ -9,9 +9,9 @@ import { AppShell } from './components/layout/AppShell'
 import { LoginPage } from './modules/auth/LoginPage'
 import { DashboardPage } from './modules/dashboard/DashboardPage'
 import { BuyersPage } from './modules/buyers/buyersPage'
-// import { SellersPage } from './modules/sellers/SellersPage'
+import { SellersPage } from './modules/sellers/sellersPage'
 import { ProductsPage } from './modules/products/productsPage'
-// import { UsersPage } from './modules/users/UsersPage'
+import { UsersPage } from './modules/users/usersPage'
 
 export default function App() {
   return (
@@ -36,7 +36,6 @@ export default function App() {
             {/* Default: redirect root to dashboard */}
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
-
             {/* Module routes: ProtectedRoute with `require` also checks role permission */}
             <Route
               path="/buyers/*"
@@ -47,7 +46,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            {/* <Route
+            <Route
               path="/sellers/*"
               element={
                 <ProtectedRoute require="sellers">
@@ -55,7 +54,7 @@ export default function App() {
                   <SellersPage />{' '}
                 </ProtectedRoute>
               }
-            /> */}
+            />
             <Route
               path="/products/*"
               element={
@@ -64,15 +63,15 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            {/* // <Route
-            //   path="/users/*"
-            //   element={
-            //     // <ProtectedRoute require="users">
-            //     //   {' '}
-            //     //   <UsersPage />{' '}
-            //     // </ProtectedRoute>
-            //   }
-            /> */}
+            <Route
+              path="/users/*"
+              element={
+                <ProtectedRoute require="users">
+                  {' '}
+                  <UsersPage />{' '}
+                </ProtectedRoute>
+              }
+            />
           </Route>
 
           {/* Catch-all: unknown URL → dashboard */}

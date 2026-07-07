@@ -24,5 +24,5 @@ interface CategoryCount {
 
 export const dashboardApi = {
   getSummary: () =>
-    api.request<{ success: boolean; data: DashboardSummary }>('GET', '/api/dashboard/summary')
+    api.request<{ success: boolean; data: DashboardSummary }>('GET', '/dashboard/summary')
 }

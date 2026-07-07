@@ -27,20 +27,20 @@ export interface ProductInput {
 export const productsApi = {
   // Also used by BuyerForm to load the interests category list
   getCategories: () =>
-    api.request<ApiSuccess<ProductCategory[]>>('GET', '/api/products/categories'),
+    api.request<ApiSuccess<ProductCategory[]>>('GET', '/products/categories'),
 
   getAll: (filters: ProductFilters = {}) =>
     api.request<ApiSuccessList<Product>>(
       'GET',
-      `/api/products?${api.qs(filters as Record<string, string>)}`
+      `/products?${api.qs(filters as Record<string, string>)}`
     ),
 
-  getById: (id: string) => api.request<ApiSuccess<Product>>('GET', `/api/products/${id}`),
+  getById: (id: string) => api.request<ApiSuccess<Product>>('GET', `/products/${id}`),
 
-  create: (data: ProductInput) => api.request<ApiSuccess<Product>>('POST', '/api/products', data),
+  create: (data: ProductInput) => api.request<ApiSuccess<Product>>('POST', '/products', data),
 
   update: (id: string, data: ProductInput) =>
-    api.request<ApiSuccess<Product>>('PUT', `/api/products/${id}`, data),
+    api.request<ApiSuccess<Product>>('PUT', `/products/${id}`, data),
 
-  remove: (id: string) => api.request<{ success: boolean }>('DELETE', `/api/products/${id}`)
+  remove: (id: string) => api.request<{ success: boolean }>('DELETE', `/products/${id}`)
 }

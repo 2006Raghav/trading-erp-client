@@ -32,23 +32,22 @@ export const buyersApi = {
   getAll: (filters: BuyerFilters = {}) =>
     api.request<ApiSuccessList<Buyer>>(
       'GET',
-      `/api/buyers?${api.qs(filters as Record<string, string>)}`
+      `/buyers?${api.qs(filters as Record<string, string>)}`
     ),
 
   /** GET /api/buyers/:id */
-  getById: (id: string) => api.request<ApiSuccess<Buyer>>('GET', `/api/buyers/${id}`),
+  getById: (id: string) => api.request<ApiSuccess<Buyer>>('GET', `/buyers/${id}`),
 
   /** GET /api/buyers/:id/history */
-  getHistory: (id: string) =>
-    api.request<ApiSuccess<unknown[]>>('GET', `/api/buyers/${id}/history`),
+  getHistory: (id: string) => api.request<ApiSuccess<unknown[]>>('GET', `/buyers/${id}/history`),
 
   /** POST /api/buyers */
-  create: (data: BuyerInput) => api.request<ApiSuccess<Buyer>>('POST', '/api/buyers', data),
+  create: (data: BuyerInput) => api.request<ApiSuccess<Buyer>>('POST', '/buyers', data),
 
   /** PUT /api/buyers/:id */
   update: (id: string, data: BuyerInput) =>
-    api.request<ApiSuccess<Buyer>>('PUT', `/api/buyers/${id}`, data),
+    api.request<ApiSuccess<Buyer>>('PUT', `/buyers/${id}`, data),
 
   /** DELETE /api/buyers/:id (soft delete) */
-  remove: (id: string) => api.request<{ success: boolean }>('DELETE', `/api/buyers/${id}`)
+  remove: (id: string) => api.request<{ success: boolean }>('DELETE', `/buyers/${id}`)
 }

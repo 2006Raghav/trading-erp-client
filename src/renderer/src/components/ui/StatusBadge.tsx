@@ -1,8 +1,3 @@
-// src/renderer/src/components/ui/StatusBadge.tsx
-// Small inline badge components used in table cells and detail views.
-
-import type { CreditRating } from '../../lib/constants'
-
 // Tailwind classes per credit rating — defined as a lookup to keep render() clean
 const RATING_STYLES: Record<string, string> = {
   A: 'bg-green-100  text-green-700  border-green-200',

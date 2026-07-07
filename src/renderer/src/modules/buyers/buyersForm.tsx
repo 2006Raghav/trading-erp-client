@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, type ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import { buyersApi, type BuyerInput } from './buyers.api'
 import { useToast } from '../auth/ToastContext'
 import { productsApi } from '../products/products.api'
