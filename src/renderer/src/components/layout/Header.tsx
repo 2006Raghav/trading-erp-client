@@ -1,29 +1,33 @@
 import { useLocation } from 'react-router-dom'
 
-// Maps URL prefixes to human-readable page titles.
-// Header.tsx is the only file that cares about this mapping.
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
-  '/buyers': 'Buyer Management',
-  '/sellers': 'Seller Management',
-  '/products': 'Product Management',
+  '/buyers': 'Buyer Directory',
+  '/sellers': 'Seller Directory',
+  '/products': 'Product Catalogue',
   '/users': 'User Management'
 }
 
 export function Header() {
   const location = useLocation()
-
-  // Find the title for the current path.
-  // startsWith() handles sub-routes like /buyers/123 → "Buyer Management"
   const title =
     PAGE_TITLES[location.pathname] ??
     Object.entries(PAGE_TITLES).find(([k]) => location.pathname.startsWith(k))?.[1] ??
-    'Trading ERP'
+    'Commodity ERP'
 
   return (
-    <header className="h-14 bg-white border-b border-slate-200 flex items-center px-6 shrink-0">
-      <h2 className="text-base font-semibold text-slate-700">{title}</h2>
-      <div className="ml-auto text-sm text-slate-400">
+    <header
+      className="flex items-center px-6 shrink-0"
+      style={{
+        height: '56px',
+        background: 'var(--color-white)',
+        borderBottom: '1px solid var(--color-slate-200)'
+      }}
+    >
+      <h1 className="text-heading-s" style={{ color: 'var(--color-ink-900)' }}>
+        {title}
+      </h1>
+      <div className="ml-auto text-body-s" style={{ color: 'var(--color-slate-500)' }}>
         {new Date().toLocaleDateString('en-GB', {
           weekday: 'long',
           day: 'numeric',

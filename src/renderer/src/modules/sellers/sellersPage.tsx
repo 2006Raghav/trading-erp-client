@@ -65,7 +65,16 @@ export function SellersPage() {
   }
 
   const columns = [
-    { key: 'sellerCode', label: 'Code', width: 100 },
+    {
+      key: 'sellerCode',
+      label: 'Code',
+      width: 110,
+      render: (val: string) => (
+        <span className="font-mono text-body-s" style={{ color: 'var(--color-slate-500)' }}>
+          {val}
+        </span>
+      )
+    },
     { key: 'companyName', label: 'Company Name' },
     { key: 'contactPerson', label: 'Contact' },
     { key: 'country', label: 'Country', width: 130 },
@@ -74,7 +83,15 @@ export function SellersPage() {
       key: 'monthlyProductionCapacity',
       label: 'Monthly Capacity',
       width: 150,
-      render: (val: number, row: Seller) => (val ? formatQuantity(val, row.capacityUnit) : '—')
+      numeric: true,
+      render: (val: number, row: Seller) =>
+        val ? (
+          <span className="font-mono" style={{ color: 'var(--color-ink-900)' }}>
+            {formatQuantity(val, row.capacityUnit)}
+          </span>
+        ) : (
+          <span style={{ color: 'var(--color-slate-300)' }}>—</span>
+        )
     },
     {
       key: '_actions',

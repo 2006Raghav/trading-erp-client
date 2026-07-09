@@ -27,6 +27,46 @@ export function UserForm({ user, onSuccess, onCancel }: Props) {
     newPassword: ''
   })
 
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '11px',
+    fontWeight: 600,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+    color: 'var(--color-slate-500)',
+    marginBottom: '6px'
+  }
+
+  const errorStyle: React.CSSProperties = {
+    fontSize: '13px',
+    color: 'var(--color-danger)',
+    marginTop: '4px'
+  }
+
+  const primaryBtnStyle: React.CSSProperties = {
+    height: '40px',
+    padding: '0 24px',
+    borderRadius: '8px',
+    background: 'var(--color-cobalt-600)',
+    color: '#fff',
+    fontSize: '14px',
+    fontWeight: 600,
+    border: 'none',
+    cursor: 'pointer'
+  }
+
+  const cancelBtnStyle: React.CSSProperties = {
+    height: '40px',
+    padding: '0 16px',
+    borderRadius: '8px',
+    background: 'var(--color-white)',
+    color: 'var(--color-ink-900)',
+    fontSize: '14px',
+    fontWeight: 500,
+    border: '1px solid var(--color-slate-200)',
+    cursor: 'pointer'
+  }
+
   function setField<K extends keyof UserInput>(key: K, value: UserInput[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (errors[key])
@@ -62,52 +102,91 @@ export function UserForm({ user, onSuccess, onCancel }: Props) {
     }
   }
 
-  const cls = (field: string) =>
-    `w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500
-     ${errors[field] ? 'border-red-300 bg-red-50' : 'border-slate-300'}`
+  function fieldStyle(hasError: boolean): React.CSSProperties {
+    return {
+      width: '100%',
+      padding: '9px 12px',
+      height: '40px',
+      fontSize: '14px',
+      lineHeight: '20px',
+      border: `1px solid ${hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'}`,
+      borderRadius: '8px',
+      background: hasError ? 'var(--color-danger-bg)' : 'var(--color-white)',
+      color: 'var(--color-ink-900)',
+      outline: 'none',
+      fontFamily: 'var(--font-ui)'
+    }
+  }
+
+  function onFocus(
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) {
+    e.target.style.borderColor = 'var(--color-cobalt-600)'
+    e.target.style.boxShadow = '0 0 0 2px var(--color-cobalt-100)'
+  }
+
+  function onBlur(
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    hasError: boolean
+  ) {
+    e.target.style.borderColor = hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'
+    e.target.style.boxShadow = ''
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Full Name *</label>
+        <label style={labelStyle}>Full Name *</label>
         <input
           value={form.fullName}
           onChange={(e) => setField('fullName', e.target.value)}
-          className={cls('fullName')}
+          onFocus={onFocus}
+          onBlur={(e) => onBlur(e, !!errors.fullName)}
+          className="w-full"
           placeholder="e.g. Rajesh Kumar"
+          style={fieldStyle(!!errors.fullName)}
         />
-        {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
+        {errors.fullName && <p style={errorStyle}>{errors.fullName}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Username *</label>
+          <label style={labelStyle}>Username *</label>
           <input
             value={form.username}
             onChange={(e) => setField('username', e.target.value)}
-            className={cls('username')}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors.username)}
+            className="w-full"
             autoComplete="off"
+            style={fieldStyle(!!errors.username)}
           />
-          {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
+          {errors.username && <p style={errorStyle}>{errors.username}</p>}
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Email</label>
+          <label style={labelStyle}>Email</label>
           <input
             type="email"
             value={form.email ?? ''}
             onChange={(e) => setField('email', e.target.value)}
-            className={cls('email')}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors.email)}
+            className="w-full"
+            style={fieldStyle(!!errors.email)}
           />
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+          {errors.email && <p style={errorStyle}>{errors.email}</p>}
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Role *</label>
+        <label style={labelStyle}>Role *</label>
         <select
           value={form.role}
           onChange={(e) => setField('role', e.target.value)}
-          className={`${cls('role')} bg-white`}
+          onFocus={onFocus}
+          onBlur={(e) => onBlur(e, !!errors.role)}
+          className="w-full bg-white"
+          style={fieldStyle(!!errors.role)}
         >
           {USER_ROLES.map((r) => (
             <option key={r} value={r}>
@@ -118,7 +197,7 @@ export function UserForm({ user, onSuccess, onCancel }: Props) {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">
+        <label style={labelStyle}>
           {isEdit ? 'New Password (leave blank to keep current)' : 'Password *'}
         </label>
         <div className="relative">
@@ -126,9 +205,12 @@ export function UserForm({ user, onSuccess, onCancel }: Props) {
             type={showPw ? 'text' : 'password'}
             value={isEdit ? (form.newPassword ?? '') : (form.password ?? '')}
             onChange={(e) => setField(isEdit ? 'newPassword' : 'password', e.target.value)}
-            className={cls(isEdit ? 'newPassword' : 'password')}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors[isEdit ? 'newPassword' : 'password'])}
+            className="w-full"
             placeholder={isEdit ? 'Enter new password to change…' : 'Min 8 characters'}
             autoComplete="new-password"
+            style={fieldStyle(!!errors[isEdit ? 'newPassword' : 'password'])}
           />
           <button
             type="button"
@@ -138,22 +220,23 @@ export function UserForm({ user, onSuccess, onCancel }: Props) {
             {showPw ? 'Hide' : 'Show'}
           </button>
         </div>
-        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+        {errors.password && <p style={errorStyle}>{errors.password}</p>}
       </div>
 
       <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-sm border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50"
+          className="transition-colors"
+          style={cancelBtnStyle}
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-2 text-sm bg-brand-600 hover:bg-brand-700 disabled:opacity-50
-                     text-white font-medium rounded-lg"
+          className="disabled:opacity-50 transition-colors"
+          style={primaryBtnStyle}
         >
           {saving ? 'Saving…' : isEdit ? 'Update User' : 'Create User'}
         </button>

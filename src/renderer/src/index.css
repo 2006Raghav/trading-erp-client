@@ -1,21 +1,109 @@
+/* ── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 @import 'tailwindcss';
+/* ── Design Token Definitions ─────────────────────────────────────────────── */
+/* All colors in the app trace to one of these variables.
+   To retheme: edit values here only. Components never use raw hex. */
 
-/* Custom scrollbar — visible in the sidebar nav and long tables */
+:root {
+  /* Neutral / Chrome */
+  --color-navy-950: #16244a; /* sidebar background */
+  --color-navy-900: #1e2f5c; /* sidebar hover rows */
+  --color-navy-700: #2c4172; /* dividers on dark surfaces */
+  --color-canvas-50: #f5f8fc; /* main content background */
+  --color-azure-100: #e1f1fe; /* section wash, table stripe */
+  --color-white: #ffffff; /* cards, modals, table rows */
+  --color-ink-900: #0f1729; /* primary text on white */
+  --color-slate-500: #64748b; /* secondary/muted text */
+  --color-slate-300: #cbd3de; /* inactive icons, disabled text */
+  --color-slate-200: #e4e8ee; /* borders/dividers on white */
+
+  /* Primary — Cobalt (action color) */
+  --color-cobalt-700: #1b3fbe; /* button hover/active */
+  --color-cobalt-600: #2554e8; /* buttons, active nav, links, focus rings */
+  --color-cobalt-100: #dce6ff; /* selected row highlight, icon tints */
+  --color-cobalt-50: #eef3ff; /* hover fill on white surfaces */
+
+  /* Semantic / Status */
+  --color-success: #16a34a;
+  --color-success-bg: #eafbf1;
+  --color-warning: #b45309;
+  --color-warning-bg: #fef3e2;
+  --color-danger: #dc2626;
+  --color-danger-bg: #fef1f1;
+  --color-info: #0284c7;
+  --color-info-bg: #eaf6fe;
+
+  /* Commodity Accent — data encoding only, not UI chrome */
+  --color-metal-gold: #c9962e;
+  --color-metal-copper: #be5f3d;
+  --color-metal-silver: #93a0ad;
+  --color-metal-zinc: #6e7f91;
+  --color-metal-cobalt: #5c7ce0; /* lighter than cobalt-600 so price lines ≠ buttons */
+
+  /* Typography */
+  --font-ui: 'Inter', system-ui, sans-serif; /* all in-app text */
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace; /* prices, codes, IDs */
+
+  /* Card shadow — §5.1 */
+  --shadow-card: 0 1px 2px rgba(15, 23, 41, 0.04), 0 1px 8px rgba(15, 23, 41, 0.03);
+  --shadow-modal: 0 20px 60px rgba(15, 23, 41, 0.18), 0 4px 16px rgba(15, 23, 41, 0.1);
+}
+
+/* ── Base Styles ───────────────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-ink-900);
+  background-color: var(--color-canvas-50);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Monospace class — applied to prices, codes, quantities */
+.font-mono {
+  font-family: var(--font-mono) !important;
+  font-feature-settings: 'tnum' 1; /* tabular numbers — digits same width */
+}
+
+/* ── Focus rings ───────────────────────────────────────────────────────────── */
+/* §8.5: visible focus ring on every interactive element.
+   outline: none only allowed if a custom ring replaces it. */
+:focus-visible {
+  outline: 2px solid var(--color-cobalt-600);
+  outline-offset: 2px;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--color-canvas-50);
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-slate-200);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--color-slate-300);
 }
 
-/* Toast slide-in animation */
+/* ── Animations ────────────────────────────────────────────────────────────── */
+/* Toast slide-in */
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -25,4 +113,39 @@
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+/* Live dot pulse — §5.6 */
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.2s ease-out;
+}
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-in,
+  .animate-pulse-dot {
+    animation: none;
+  }
+}
+/* Hide scrollbar for specific containers but keep functionality */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera/Electron */
 }

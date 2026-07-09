@@ -1,13 +1,8 @@
-// src/renderer/src/components/layout/Sidebar.tsx
-//
-// Left navigation panel. Role-aware: hides items the user's role cannot access.
-// V2 modules are shown as disabled with a "V2" badge.
-
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../modules/auth/AuthContext'
 import {
   LayoutDashboard,
-  Users,
+  Users2,
   Building2,
   Package,
   FileText,
@@ -18,9 +13,6 @@ import {
   type LucideIcon
 } from 'lucide-react'
 
-// ── Nav item definition ───────────────────────────────────────────────────────
-// `module` matches keys in ROLE_PERMISSIONS. null means no permission check (dashboard).
-// `disabled` = V2 feature: shown but not clickable.
 interface NavItem {
   to: string
   label: string
@@ -29,98 +21,171 @@ interface NavItem {
   disabled?: boolean
 }
 
-// To add a new nav item: add one entry here. Nothing else needs to change.
 const NAV_ITEMS: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, module: null },
-  { to: '/buyers', label: 'Buyers', icon: Users, module: 'buyers' },
+  { to: '/buyers', label: 'Buyers', icon: Users2, module: 'buyers' },
   { to: '/sellers', label: 'Sellers', icon: Building2, module: 'sellers' },
   { to: '/products', label: 'Products', icon: Package, module: 'products' },
   { to: '/users', label: 'Users', icon: UserCog, module: 'users' },
-  // V2 modules — visible but disabled
   { to: '/inquiries', label: 'Inquiries', icon: FileText, module: 'inquiries', disabled: true },
   { to: '/shipments', label: 'Shipments', icon: Ship, module: 'shipments', disabled: true },
   { to: '/payments', label: 'Payments', icon: DollarSign, module: 'payments', disabled: true }
 ]
 
+// Deterministic avatar color from entity name — §5.5
+const AVATAR_PALETTES = [
+  { bg: 'bg-cobalt-100', text: 'text-cobalt-700' },
+  { bg: 'bg-[#FEF9E7]', text: 'text-[#C9962E]' }, // gold tint
+  { bg: 'bg-[#FDF0EC]', text: 'text-[#BE5F3D]' }, // copper tint
+  { bg: 'bg-slate-200', text: 'text-ink-900' }
+] as const
+
+export function avatarPalette(name?: string) {
+  if (!name) return AVATAR_PALETTES[0] // Add this safety check
+
+  let hash = 0
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  return AVATAR_PALETTES[Math.abs(hash) % AVATAR_PALETTES.length]
+}
+
 export function Sidebar() {
   const { user, can, logout } = useAuth()
+  const palette = user?.fullName ? avatarPalette(user.fullName) : AVATAR_PALETTES[1]
+  const initial = user?.fullName?.charAt(0).toUpperCase() ?? '?'
 
   return (
-    <aside className="w-60 bg-brand-900 flex flex-col h-full shrink-0">
-      {/* Brand header */}
-      <div className="px-5 py-5 border-b border-brand-700">
+    <aside
+      className="flex flex-col h-full shrink-0"
+      style={{ width: '240px', background: 'var(--color-navy-950)' }}
+    >
+      {/* Wordmark */}
+      <div className="px-5 py-5" style={{ borderBottom: '1px solid var(--color-navy-700)' }}>
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-sm">
-            📊
+          {/* Logo mark — 32px square pill */}
+          <div
+            className="flex items-center justify-center rounded-btn text-white text-xs font-bold shrink-0"
+            style={{ width: 32, height: 32, background: 'var(--color-cobalt-600)' }}
+          >
+            CE
           </div>
           <div>
-            <p className="text-white font-semibold text-sm leading-tight">Trading ERP</p>
-            <p className="text-brand-300 text-xs">v1.0</p>
+            <p className="text-white font-semibold text-body-m leading-tight">Commodity ERP</p>
+            <p
+              className="text-caption uppercase tracking-widest"
+              style={{ color: 'var(--color-slate-500)' }}
+            >
+              Global Trade
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Navigation list — iterates NAV_ITEMS, skips inaccessible ones */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto no-scrollbar">
+        {' '}
         {NAV_ITEMS.map(({ to, label, icon: Icon, module, disabled }) => {
-          // If the item has a module guard and the user doesn't have permission,
-          // hide it entirely (unless it's a disabled V2 placeholder — those always show)
           if (module && !can(module) && !disabled) return null
 
-          // V2 placeholder: looks like a nav item but isn't clickable
           if (disabled) {
             return (
               <div
                 key={to}
-                className="flex items-center gap-3 px-3 py-2 rounded-lg text-brand-500 cursor-not-allowed select-none"
+                className="flex items-center gap-3 px-3 cursor-not-allowed select-none"
+                style={{ height: '40px', borderRadius: '8px', color: 'var(--color-navy-700)' }}
               >
-                <Icon size={16} />
-                <span className="text-sm">{label}</span>
-                <span className="ml-auto text-xs bg-brand-800 px-1.5 py-0.5 rounded text-brand-400">
+                <Icon size={20} strokeWidth={1.5} />
+                <span className="text-body-m">{label}</span>
+                <span
+                  className="ml-auto text-caption uppercase"
+                  style={{ color: 'var(--color-navy-700)' }}
+                >
                   V2
                 </span>
               </div>
             )
           }
 
-          // Active item: filled background. Inactive: subtle text that brightens on hover.
           return (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                `flex items-center gap-3 px-3 transition-colors ${
                   isActive
-                    ? 'bg-brand-600 text-white'
-                    : 'text-brand-200 hover:bg-brand-800 hover:text-white'
+                    ? 'text-white' /* active: white text */
+                    : 'text-slate-300 hover:text-white'
                 }`
               }
+              style={({ isActive }) => ({
+                height: '40px',
+                borderRadius: '8px',
+                background: isActive
+                  ? 'var(--color-cobalt-600)' /* §5.4: solid filled pill */
+                  : undefined
+              })}
+              onMouseEnter={(e) => {
+                if (!(e.currentTarget as HTMLElement).classList.contains('active')) {
+                  ;(e.currentTarget as HTMLElement).style.background = 'var(--color-navy-900)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                const el = e.currentTarget as HTMLElement
+                if (!el.querySelector('[aria-current]')) {
+                  el.style.background = ''
+                }
+              }}
             >
-              <Icon size={16} />
-              {label}
+              {({ isActive }) => (
+                <>
+                  <Icon
+                    size={20}
+                    strokeWidth={1.5}
+                    style={{ color: isActive ? '#fff' : 'inherit' }}
+                  />
+                  <span className="text-body-m">{label}</span>
+                </>
+              )}
             </NavLink>
           )
         })}
       </nav>
 
-      {/* User badge + logout button */}
-      <div className="px-3 py-4 border-t border-brand-700">
-        {/* Avatar (first letter of full name) + name + role */}
-        <div className="flex items-center gap-3 px-3 py-2 mb-1">
-          <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-semibold">
-            {user?.fullName?.charAt(0).toUpperCase()}
+      {/* User + Logout */}
+      <div className="px-3 py-4" style={{ borderTop: '1px solid var(--color-navy-700)' }}>
+        <div className="flex items-center gap-3 px-3 mb-1" style={{ height: '40px' }}>
+          {/* Avatar: deterministic palette from full name */}
+          <div
+            className={`flex items-center justify-center rounded-full text-body-s font-semibold shrink-0 ${palette.bg} ${palette.text}`}
+            style={{ width: 32, height: 32 }}
+          >
+            {initial}
           </div>
           <div className="min-w-0">
-            <p className="text-white text-xs font-medium truncate">{user?.fullName}</p>
-            <p className="text-brand-300 text-xs capitalize">{user?.role}</p>
+            <p className="text-body-s font-medium text-white truncate">{user?.fullName}</p>
+            <p className="text-caption capitalize" style={{ color: 'var(--color-slate-500)' }}>
+              {user?.role}
+            </p>
           </div>
         </div>
+
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2 text-brand-200
-                     hover:bg-brand-800 hover:text-white text-sm rounded-lg transition-colors"
+          className="flex items-center gap-3 w-full px-3 text-body-m transition-colors"
+          style={{
+            height: '40px',
+            borderRadius: '8px',
+            color: 'var(--color-slate-300)'
+          }}
+          onMouseEnter={(e) => {
+            ;(e.currentTarget as HTMLElement).style.background = 'var(--color-navy-900)'
+            ;(e.currentTarget as HTMLElement).style.color = '#fff'
+          }}
+          onMouseLeave={(e) => {
+            ;(e.currentTarget as HTMLElement).style.background = ''
+            ;(e.currentTarget as HTMLElement).style.color = 'var(--color-slate-300)'
+          }}
         >
-          <LogOut size={16} />
+          <LogOut size={20} strokeWidth={1.5} />
           Sign Out
         </button>
       </div>

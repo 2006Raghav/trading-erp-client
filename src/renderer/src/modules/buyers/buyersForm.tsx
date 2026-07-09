@@ -6,7 +6,7 @@ import { CREDIT_RATINGS, COMMODITY_UNITS } from '../../lib/constants'
 import type { Buyer, ProductCategory } from '../../lib/types'
 
 interface BuyerFormProps {
-  buyer?: Buyer // undefined = add mode, defined = edit mode
+  buyer?: Buyer
   onSuccess: (buyer: Buyer) => void
   onCancel: () => void
 }
@@ -19,8 +19,6 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // ── Form state ─────────────────────────────────────────────────────────────
-  // Initialise from existing buyer data (edit mode) or empty strings (add mode).
   const [form, setForm] = useState<BuyerInput>({
     companyName: buyer?.companyName ?? '',
     contactPerson: buyer?.contactPerson ?? '',
@@ -38,18 +36,64 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
     interestIds: buyer?.interests?.map((i) => i.id) ?? []
   })
 
-  // Load product categories for the interests toggle section
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '11px',
+    fontWeight: 600,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+    color: 'var(--color-slate-500)',
+    marginBottom: '6px'
+  }
+
+  const errorStyle: React.CSSProperties = {
+    fontSize: '13px',
+    color: 'var(--color-danger)',
+    marginTop: '4px'
+  }
+
+  const sectionHeadingStyle: React.CSSProperties = {
+    fontSize: '11px',
+    fontWeight: 600,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+    color: 'var(--color-slate-500)',
+    marginBottom: '12px'
+  }
+
+  const primaryBtnStyle: React.CSSProperties = {
+    height: '40px',
+    padding: '0 24px',
+    borderRadius: '8px',
+    background: 'var(--color-cobalt-600)',
+    color: '#fff',
+    fontSize: '14px',
+    fontWeight: 600,
+    border: 'none',
+    cursor: 'pointer'
+  }
+
+  const cancelBtnStyle: React.CSSProperties = {
+    height: '40px',
+    padding: '0 16px',
+    borderRadius: '8px',
+    background: 'var(--color-white)',
+    color: 'var(--color-ink-900)',
+    fontSize: '14px',
+    fontWeight: 500,
+    border: '1px solid var(--color-slate-200)',
+    cursor: 'pointer'
+  }
+
   useEffect(() => {
     productsApi
       .getCategories()
       .then((res) => {
         if (res.success) setCategories(res.data)
       })
-      .catch(() => {}) // Silently fail — interests are optional
+      .catch(() => {})
   }, [])
 
-  // ── Field update helper ────────────────────────────────────────────────────
-  // Updates one field in form state and clears its error if one existed.
   function setField<K extends keyof BuyerInput>(field: K, value: BuyerInput[K]) {
     setForm((prev) => ({ ...prev, [field]: value }))
     if (errors[field])
@@ -60,8 +104,6 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
       })
   }
 
-  // ── Interest toggle ────────────────────────────────────────────────────────
-  // Adds or removes a category ID from the interestIds array.
   function toggleInterest(catId: string) {
     setForm((prev) => ({
       ...prev,
@@ -71,9 +113,6 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
     }))
   }
 
-  // ── Client-side validation ─────────────────────────────────────────────────
-  // Catches obvious errors before making a network call.
-  // The server validates too — this is UX-only, not a security measure.
   function validateForm(): boolean {
     const e: Record<string, string> = {}
     if (!form.companyName?.trim()) e.companyName = 'Company name is required'
@@ -91,7 +130,6 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
     return Object.keys(e).length === 0
   }
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!validateForm()) return
@@ -107,12 +145,37 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
     }
   }
 
-  // ── Nested builder: reusable field renderer ────────────────────────────────
-  // Defined inside the component so it has access to `form`, `errors`, `setField`.
-  // Returns a complete field block (label + input + error message).
-  // This is the nested-function approach: the helper is local to where it's used,
-  // keeps field JSX DRY (one call per field instead of 20 lines each), and is not
-  // exported because no other component needs it.
+  function fieldStyle(hasError: boolean): React.CSSProperties {
+    return {
+      width: '100%',
+      padding: '9px 12px',
+      height: '40px',
+      fontSize: '14px',
+      lineHeight: '20px',
+      border: `1px solid ${hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'}`,
+      borderRadius: '8px',
+      background: hasError ? 'var(--color-danger-bg)' : 'var(--color-white)',
+      color: 'var(--color-ink-900)',
+      outline: 'none',
+      fontFamily: 'var(--font-ui)'
+    }
+  }
+
+  function onFocus(
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) {
+    e.target.style.borderColor = 'var(--color-cobalt-600)'
+    e.target.style.boxShadow = '0 0 0 2px var(--color-cobalt-100)'
+  }
+
+  function onBlur(
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    hasError: boolean
+  ) {
+    e.target.style.borderColor = hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'
+    e.target.style.boxShadow = ''
+  }
+
   function buildField(
     name: keyof BuyerInput,
     label: string,
@@ -121,28 +184,26 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
   ): ReactNode {
     return (
       <div>
-        <label className="block text-xs font-medium text-slate-600 mb-1">{label}</label>
+        <label style={labelStyle}>{label}</label>
         <input
           type={type}
           value={(form[name] as string) ?? ''}
           onChange={(e) => setField(name, e.target.value as any)}
+          onFocus={onFocus}
+          onBlur={(e) => onBlur(e, !!errors[name])}
           placeholder={placeholder}
-          className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2
-            focus:ring-brand-500 focus:border-transparent transition-shadow
-            ${errors[name] ? 'border-red-300 bg-red-50' : 'border-slate-300'}`}
+          className="w-full"
+          style={fieldStyle(!!errors[name])}
         />
-        {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]}</p>}
+        {errors[name] && <p style={errorStyle}>{errors[name]}</p>}
       </div>
     )
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* ── Company Information ──────────────────────────────────────────── */}
       <section>
-        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-          Company Information
-        </h4>
+        <h4 style={sectionHeadingStyle}>Company Information</h4>
         <div className="grid grid-cols-2 gap-4">
           {buildField('companyName', 'Company Name *')}
           {buildField('contactPerson', 'Contact Person')}
@@ -154,23 +215,21 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
         </div>
       </section>
 
-      {/* ── Legal & Financial ────────────────────────────────────────────── */}
       <section>
-        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-          Legal & Financial
-        </h4>
+        <h4 style={sectionHeadingStyle}>Legal & Financial</h4>
         <div className="grid grid-cols-2 gap-4">
           {buildField('businessRegistrationNo', 'Business Reg. Number')}
           {buildField('taxNumber', 'Tax Number')}
 
-          {/* Credit Rating dropdown */}
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">Credit Rating</label>
+            <label style={labelStyle}>Credit Rating</label>
             <select
               value={form.creditRating ?? 'Unrated'}
               onChange={(e) => setField('creditRating', e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg
-                         focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+              onFocus={onFocus}
+              onBlur={(e) => onBlur(e, false)}
+              className="w-full bg-white"
+              style={fieldStyle(false)}
             >
               {CREDIT_RATINGS.map((r) => (
                 <option key={r} value={r}>
@@ -180,26 +239,27 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
             </select>
           </div>
 
-          {/* Annual Capacity: number + unit select */}
           <div>
-            <label className="block text-xs font-medium text-slate-600 mb-1">
-              Annual Purchase Capacity
-            </label>
+            <label style={labelStyle}>Annual Purchase Capacity</label>
             <div className="flex gap-2">
               <input
                 type="number"
                 value={form.annualPurchaseCapacity ?? ''}
                 onChange={(e) => setField('annualPurchaseCapacity', e.target.value)}
-                className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg
-                           focus:outline-none focus:ring-2 focus:ring-brand-500"
+                onFocus={onFocus}
+                onBlur={(e) => onBlur(e, false)}
+                className="flex-4"
                 placeholder="0"
                 min="0"
+                style={fieldStyle(false)}
               />
               <select
                 value={form.capacityUnit ?? 'MT'}
                 onChange={(e) => setField('capacityUnit', e.target.value)}
-                className="w-24 px-2 py-2 text-sm border border-slate-300 rounded-lg
-                           focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white"
+                onFocus={onFocus}
+                onBlur={(e) => onBlur(e, false)}
+                className="flex-1 bg-white"
+                style={fieldStyle(false)}
               >
                 {COMMODITY_UNITS.map((u) => (
                   <option key={u} value={u}>
@@ -212,12 +272,8 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
         </div>
       </section>
 
-      {/* ── Product Interests ─────────────────────────────────────────────── */}
       <section>
-        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
-          Product Interests
-        </h4>
-        {/* Toggle buttons: filled = selected, outlined = unselected */}
+        <h4 style={sectionHeadingStyle}>Product Interests</h4>
         <div className="flex flex-wrap gap-2">
           {categories.map((cat) => (
             <button
@@ -236,34 +292,34 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
         </div>
       </section>
 
-      {/* ── Notes ────────────────────────────────────────────────────────── */}
       <section>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Notes</label>
+        <label style={labelStyle}>Notes</label>
         <textarea
           value={form.notes ?? ''}
           onChange={(e) => setField('notes', e.target.value)}
+          onFocus={onFocus}
+          onBlur={(e) => onBlur(e, false)}
           rows={3}
-          className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg
-                     focus:outline-none focus:ring-2 focus:ring-brand-500 resize-none"
+          className="w-full resize-none"
           placeholder="Any additional notes about this buyer…"
+          style={fieldStyle(false)}
         />
       </section>
 
-      {/* ── Actions ──────────────────────────────────────────────────────── */}
       <div className="flex justify-end gap-3 pt-2 border-t border-slate-100">
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-sm border border-slate-300 rounded-lg
-                     text-slate-600 hover:bg-slate-50 transition-colors"
+          className="transition-colors"
+          style={cancelBtnStyle}
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-2 text-sm bg-brand-600 hover:bg-brand-700 disabled:opacity-50
-                     text-white font-medium rounded-lg transition-colors"
+          className="disabled:opacity-50 transition-colors"
+          style={primaryBtnStyle}
         >
           {saving ? 'Saving…' : isEdit ? 'Update Buyer' : 'Add Buyer'}
         </button>

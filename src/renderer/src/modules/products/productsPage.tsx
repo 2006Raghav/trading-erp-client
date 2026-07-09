@@ -77,19 +77,34 @@ export function ProductsPage() {
     { key: 'categoryName', label: 'Category', width: 140 },
     { key: 'productName', label: 'Product Name' },
     { key: 'sellerName', label: 'Seller', width: 180 },
-    { key: 'purity', label: 'Purity', width: 90 },
+    { key: 'purity', label: 'Purity', numeric: true, width: 90 },
     { key: 'origin', label: 'Origin', width: 120 },
     {
       key: 'availableQuantity',
       label: 'Qty Available',
+      numeric: true,
       width: 130,
-      render: (val: number, row: Product) => formatQuantity(val, row.quantityUnit)
+      render: (val: number, row: Product) =>
+        val ? (
+          <span className="font-mono" style={{ color: 'var(--color-ink-900)' }}>
+            {formatQuantity(val, row.quantityUnit)}
+          </span>
+        ) : (
+          <span style={{ color: 'var(--color-slate-300)' }}>—</span>
+        )
     },
     {
       key: 'pricePerUnit',
       label: 'Price / Unit',
-      width: 130,
-      render: (val: number, row: Product) => (val ? formatCurrency(val, row.currency) : '—')
+      numeric: true, // right-align + monospace via DataTable's numeric prop
+      render: (val: number, row: Product) =>
+        val ? (
+          <span className="font-mono" style={{ color: 'var(--color-ink-900)' }}>
+            {formatCurrency(val, row.currency)}
+          </span>
+        ) : (
+          <span style={{ color: 'var(--color-slate-300)' }}>—</span>
+        )
     },
     {
       key: '_actions',

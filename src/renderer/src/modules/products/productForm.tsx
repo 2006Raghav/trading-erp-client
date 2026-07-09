@@ -39,6 +39,46 @@ export function ProductForm({
     warehouseLocation: product?.warehouseLocation ?? ''
   })
 
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '11px',
+    fontWeight: 600,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+    color: 'var(--color-slate-500)',
+    marginBottom: '6px'
+  }
+
+  const errorStyle: React.CSSProperties = {
+    fontSize: '13px',
+    color: 'var(--color-danger)',
+    marginTop: '4px'
+  }
+
+  const primaryBtnStyle: React.CSSProperties = {
+    height: '40px',
+    padding: '0 24px',
+    borderRadius: '8px',
+    background: 'var(--color-cobalt-600)',
+    color: '#fff',
+    fontSize: '14px',
+    fontWeight: 600,
+    border: 'none',
+    cursor: 'pointer'
+  }
+
+  const cancelBtnStyle: React.CSSProperties = {
+    height: '40px',
+    padding: '0 16px',
+    borderRadius: '8px',
+    background: 'var(--color-white)',
+    color: 'var(--color-ink-900)',
+    fontSize: '14px',
+    fontWeight: 500,
+    border: '1px solid var(--color-slate-200)',
+    cursor: 'pointer'
+  }
+
   function setField<K extends keyof ProductInput>(key: K, value: ProductInput[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (errors[key])
@@ -49,9 +89,6 @@ export function ProductForm({
       })
   }
 
-  // ── Nested validation builder ─────────────────────────────────────────────
-  // Returns a map of field → error message for all invalid fields.
-  // Declared inside the component so it has access to `form` without being passed as arg.
   function validateForm(): Record<string, string> {
     const e: Record<string, string> = {}
     if (!form.sellerId) e.sellerId = 'Seller is required'
@@ -87,25 +124,49 @@ export function ProductForm({
     }
   }
 
-  // ── Nested helper: input class builder ────────────────────────────────────
-  // Returns the Tailwind class string for a given field, adding red styling when
-  // that field has an error. Declared locally — not useful outside this component.
-  function inputCls(field: string): string {
-    return `w-full px-3 py-2 text-sm border rounded-lg focus:outline-none
-            focus:ring-2 focus:ring-brand-500 focus:border-transparent
-            ${errors[field] ? 'border-red-300 bg-red-50' : 'border-slate-300'}`
+  function fieldStyle(hasError: boolean): React.CSSProperties {
+    return {
+      width: '100%',
+      padding: '9px 12px',
+      height: '40px',
+      fontSize: '14px',
+      lineHeight: '20px',
+      border: `1px solid ${hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'}`,
+      borderRadius: '8px',
+      background: hasError ? 'var(--color-danger-bg)' : 'var(--color-white)',
+      color: 'var(--color-ink-900)',
+      outline: 'none',
+      fontFamily: 'var(--font-ui)'
+    }
+  }
+
+  function onFocus(
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) {
+    e.target.style.borderColor = 'var(--color-cobalt-600)'
+    e.target.style.boxShadow = '0 0 0 2px var(--color-cobalt-100)'
+  }
+
+  function onBlur(
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    hasError: boolean
+  ) {
+    e.target.style.borderColor = hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'
+    e.target.style.boxShadow = ''
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-2 gap-4">
-        {/* Seller dropdown */}
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Seller *</label>
+          <label style={labelStyle}>Seller *</label>
           <select
             value={form.sellerId}
             onChange={(e) => setField('sellerId', e.target.value)}
-            className={`${inputCls('sellerId')} bg-white`}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors.sellerId)}
+            className="bg-white"
+            style={fieldStyle(!!errors.sellerId)}
           >
             <option value="">Select seller…</option>
             {sellers.map((s) => (
@@ -114,16 +175,18 @@ export function ProductForm({
               </option>
             ))}
           </select>
-          {errors.sellerId && <p className="text-red-500 text-xs mt-1">{errors.sellerId}</p>}
+          {errors.sellerId && <p style={errorStyle}>{errors.sellerId}</p>}
         </div>
 
-        {/* Category dropdown */}
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Category *</label>
+          <label style={labelStyle}>Category *</label>
           <select
             value={form.categoryId}
             onChange={(e) => setField('categoryId', e.target.value)}
-            className={`${inputCls('categoryId')} bg-white`}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors.categoryId)}
+            className="bg-white"
+            style={fieldStyle(!!errors.categoryId)}
           >
             <option value="">Select category…</option>
             {categories.map((c) => (
@@ -132,87 +195,97 @@ export function ProductForm({
               </option>
             ))}
           </select>
-          {errors.categoryId && <p className="text-red-500 text-xs mt-1">{errors.categoryId}</p>}
+          {errors.categoryId && <p style={errorStyle}>{errors.categoryId}</p>}
         </div>
 
-        {/* Product Name — full width */}
         <div className="col-span-2">
-          <label className="block text-xs font-medium text-slate-600 mb-1">Product Name *</label>
+          <label style={labelStyle}>Product Name *</label>
           <input
             value={form.productName}
             onChange={(e) => setField('productName', e.target.value)}
-            className={inputCls('productName')}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors.productName)}
+            className="w-full"
             placeholder="e.g. Copper Cathode Grade A — DRC Origin"
+            style={fieldStyle(!!errors.productName)}
           />
-          {errors.productName && <p className="text-red-500 text-xs mt-1">{errors.productName}</p>}
+          {errors.productName && <p style={errorStyle}>{errors.productName}</p>}
         </div>
 
-        {/* Purity */}
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Purity</label>
+          <label style={labelStyle}>Purity</label>
           <input
             value={form.purity ?? ''}
             onChange={(e) => setField('purity', e.target.value)}
-            className={inputCls('purity')}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors.purity)}
+            className="w-full"
             placeholder="e.g. 99.99%"
+            style={fieldStyle(!!errors.purity)}
           />
         </div>
 
-        {/* Grade */}
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Grade</label>
+          <label style={labelStyle}>Grade</label>
           <input
             value={form.grade ?? ''}
             onChange={(e) => setField('grade', e.target.value)}
-            className={inputCls('grade')}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors.grade)}
+            className="w-full"
             placeholder="e.g. LME Grade A"
+            style={fieldStyle(!!errors.grade)}
           />
         </div>
 
-        {/* Origin */}
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Origin Country</label>
+          <label style={labelStyle}>Origin Country</label>
           <input
             value={form.origin ?? ''}
             onChange={(e) => setField('origin', e.target.value)}
-            className={inputCls('origin')}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors.origin)}
+            className="w-full"
             placeholder="e.g. Democratic Republic of Congo"
+            style={fieldStyle(!!errors.origin)}
           />
         </div>
 
-        {/* Warehouse */}
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">
-            Warehouse Location
-          </label>
+          <label style={labelStyle}>Warehouse Location</label>
           <input
             value={form.warehouseLocation ?? ''}
             onChange={(e) => setField('warehouseLocation', e.target.value)}
-            className={inputCls('warehouseLocation')}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors.warehouseLocation)}
+            className="w-full"
             placeholder="e.g. Durban Port, South Africa"
+            style={fieldStyle(!!errors.warehouseLocation)}
           />
         </div>
 
-        {/* Quantity + Unit */}
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">
-            Available Quantity
-          </label>
+          <label style={labelStyle}>Available Quantity</label>
           <div className="flex gap-2">
             <input
               type="number"
               value={form.availableQuantity ?? ''}
               onChange={(e) => setField('availableQuantity', e.target.value)}
-              className={`flex-1 ${inputCls('availableQuantity')}`}
+              onFocus={onFocus}
+              onBlur={(e) => onBlur(e, !!errors.availableQuantity)}
+              className="flex-4"
               placeholder="0"
               min="0"
               step="0.01"
+              style={fieldStyle(!!errors.availableQuantity)}
             />
             <select
               value={form.quantityUnit ?? 'MT'}
               onChange={(e) => setField('quantityUnit', e.target.value)}
-              className="w-20 px-2 py-2 text-sm border border-slate-300 rounded-lg bg-white
-                         focus:outline-none focus:ring-2 focus:ring-brand-500"
+              onFocus={onFocus}
+              onBlur={(e) => onBlur(e, false)}
+              className=" flex-1 bg-white"
+              style={fieldStyle(false)}
             >
               {COMMODITY_UNITS.map((u) => (
                 <option key={u} value={u}>
@@ -221,20 +294,19 @@ export function ProductForm({
               ))}
             </select>
           </div>
-          {errors.availableQuantity && (
-            <p className="text-red-500 text-xs mt-1">{errors.availableQuantity}</p>
-          )}
+          {errors.availableQuantity && <p style={errorStyle}>{errors.availableQuantity}</p>}
         </div>
 
-        {/* Currency + Price */}
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Price Per Unit</label>
+          <label style={labelStyle}>Price Per Unit</label>
           <div className="flex gap-2">
             <select
               value={form.currency ?? 'USD'}
               onChange={(e) => setField('currency', e.target.value)}
-              className="w-24 px-2 py-2 text-sm border border-slate-300 rounded-lg bg-white
-                         focus:outline-none focus:ring-2 focus:ring-brand-500"
+              onFocus={onFocus}
+              onBlur={(e) => onBlur(e, false)}
+              className="flex-1 bg-white"
+              style={fieldStyle(false)}
             >
               {CURRENCIES.map((c) => (
                 <option key={c} value={c}>
@@ -246,15 +318,16 @@ export function ProductForm({
               type="number"
               value={form.pricePerUnit ?? ''}
               onChange={(e) => setField('pricePerUnit', e.target.value)}
-              className={`flex-1 ${inputCls('pricePerUnit')}`}
+              onFocus={onFocus}
+              onBlur={(e) => onBlur(e, !!errors.pricePerUnit)}
+              className="flex-4"
               placeholder="0.00"
               min="0"
               step="0.0001"
+              style={fieldStyle(!!errors.pricePerUnit)}
             />
           </div>
-          {errors.pricePerUnit && (
-            <p className="text-red-500 text-xs mt-1">{errors.pricePerUnit}</p>
-          )}
+          {errors.pricePerUnit && <p style={errorStyle}>{errors.pricePerUnit}</p>}
         </div>
       </div>
 
@@ -262,16 +335,16 @@ export function ProductForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-sm border border-slate-300 rounded-lg
-                     text-slate-600 hover:bg-slate-50 transition-colors"
+          className="transition-colors"
+          style={cancelBtnStyle}
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-2 text-sm bg-brand-600 hover:bg-brand-700 disabled:opacity-50
-                     text-white font-medium rounded-lg transition-colors"
+          className="disabled:opacity-50 transition-colors"
+          style={primaryBtnStyle}
         >
           {saving ? 'Saving…' : isEdit ? 'Update Product' : 'Add Product'}
         </button>

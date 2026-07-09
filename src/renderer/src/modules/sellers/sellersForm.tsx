@@ -40,6 +40,55 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
     notes: seller?.notes ?? ''
   })
 
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    fontSize: '11px',
+    fontWeight: 600,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+    color: 'var(--color-slate-500)',
+    marginBottom: '6px'
+  }
+
+  const errorStyle: React.CSSProperties = {
+    fontSize: '13px',
+    color: 'var(--color-danger)',
+    marginTop: '4px'
+  }
+
+  const sectionHeadingStyle: React.CSSProperties = {
+    fontSize: '11px',
+    fontWeight: 600,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+    color: 'var(--color-slate-500)',
+    marginBottom: '12px'
+  }
+
+  const primaryBtnStyle: React.CSSProperties = {
+    height: '40px',
+    padding: '0 24px',
+    borderRadius: '8px',
+    background: 'var(--color-cobalt-600)',
+    color: '#fff',
+    fontSize: '14px',
+    fontWeight: 600,
+    border: 'none',
+    cursor: 'pointer'
+  }
+
+  const cancelBtnStyle: React.CSSProperties = {
+    height: '40px',
+    padding: '0 16px',
+    borderRadius: '8px',
+    background: 'var(--color-white)',
+    color: 'var(--color-ink-900)',
+    fontSize: '14px',
+    fontWeight: 500,
+    border: '1px solid var(--color-slate-200)',
+    cursor: 'pointer'
+  }
+
   function setField<K extends keyof SellerInput>(key: K, value: SellerInput[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (errors[key])
@@ -86,88 +135,123 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
     }
   }
 
-  const cls = (field: string) =>
-    `w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2
-     focus:ring-brand-500 focus:border-transparent
-     ${errors[field] ? 'border-red-300 bg-red-50' : 'border-slate-300'}`
+  function fieldStyle(hasError: boolean): React.CSSProperties {
+    return {
+      width: '100%',
+      padding: '9px 12px',
+      height: '40px',
+      fontSize: '14px',
+      lineHeight: '20px',
+      border: `1px solid ${hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'}`,
+      borderRadius: '8px',
+      background: hasError ? 'var(--color-danger-bg)' : 'var(--color-white)',
+      color: 'var(--color-ink-900)',
+      outline: 'none',
+      fontFamily: 'var(--font-ui)'
+    }
+  }
+
+  function onFocus(
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) {
+    e.target.style.borderColor = 'var(--color-cobalt-600)'
+    e.target.style.boxShadow = '0 0 0 2px var(--color-cobalt-100)'
+  }
+
+  function onBlur(
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    hasError: boolean
+  ) {
+    e.target.style.borderColor = hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'
+    e.target.style.boxShadow = ''
+  }
 
   const SectionTitle = ({ title }: { title: string }) => (
-    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">{title}</h4>
+    <h4 style={sectionHeadingStyle}>{title}</h4>
   )
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Company */}
       <section>
         <SectionTitle title="Company Information" />
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
-            <label className="block text-xs font-medium text-slate-600 mb-1">Company Name *</label>
+            <label style={labelStyle}>Company Name *</label>
             <input
               value={form.companyName}
               onChange={(e) => setField('companyName', e.target.value)}
-              className={cls('companyName')}
+              onFocus={onFocus}
+              onBlur={(e) => onBlur(e, !!errors.companyName)}
+              className="w-full"
               placeholder="e.g. Global Metals Ltd."
+              style={fieldStyle(!!errors.companyName)}
             />
-            {errors.companyName && (
-              <p className="text-red-500 text-xs mt-1">{errors.companyName}</p>
-            )}
+            {errors.companyName && <p style={errorStyle}>{errors.companyName}</p>}
           </div>
           {(['country', 'contactPerson', 'email', 'phone'] as const).map((f) => (
             <div key={f}>
-              <label className="block text-xs font-medium text-slate-600 mb-1 capitalize">
+              <label style={labelStyle}>
                 {f === 'contactPerson' ? 'Contact Person' : f.charAt(0).toUpperCase() + f.slice(1)}
               </label>
               <input
                 value={(form[f] as string) ?? ''}
                 onChange={(e) => setField(f, e.target.value)}
+                onFocus={onFocus}
+                onBlur={(e) => onBlur(e, !!errors[f])}
                 type={f === 'email' ? 'email' : 'text'}
-                className={cls(f)}
+                className="w-full"
+                style={fieldStyle(!!errors[f])}
               />
-              {errors[f] && <p className="text-red-500 text-xs mt-1">{errors[f]}</p>}
+              {errors[f] && <p style={errorStyle}>{errors[f]}</p>}
             </div>
           ))}
         </div>
       </section>
 
-      {/* Addresses */}
       <section>
         <SectionTitle title="Addresses" />
         <div className="grid grid-cols-2 gap-4">
           {(['factoryAddress', 'warehouseAddress'] as const).map((f) => (
             <div key={f}>
-              <label className="block text-xs font-medium text-slate-600 mb-1">
+              <label style={labelStyle}>
                 {f === 'factoryAddress' ? 'Factory Address' : 'Warehouse Address'}
               </label>
               <textarea
                 value={form[f] ?? ''}
                 onChange={(e) => setField(f, e.target.value)}
+                onFocus={onFocus}
+                onBlur={(e) => onBlur(e, false)}
                 rows={2}
-                className={`${cls(f)} resize-none`}
+                className="w-full resize-none"
+                style={fieldStyle(false)}
               />
             </div>
           ))}
         </div>
       </section>
 
-      {/* Capacity */}
       <section>
         <SectionTitle title="Production Capacity" />
-        <div className="flex gap-3 max-w-xs">
+        <div className="flex gap-3 max-w-md">
           <input
             type="number"
             value={form.monthlyProductionCapacity ?? ''}
             onChange={(e) => setField('monthlyProductionCapacity', e.target.value)}
-            className={`flex-1 ${cls('monthlyProductionCapacity')}`}
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, !!errors.monthlyProductionCapacity)}
+            className="flex-7"
             placeholder="0"
             min="0"
             step="0.01"
+            style={fieldStyle(!!errors.monthlyProductionCapacity)}
           />
           <select
             value={form.capacityUnit ?? 'MT'}
             onChange={(e) => setField('capacityUnit', e.target.value)}
-            className="w-24 px-2 py-2 text-sm border border-slate-300 rounded-lg bg-white
-                       focus:outline-none focus:ring-2 focus:ring-brand-500"
+            onFocus={onFocus}
+            onBlur={(e) => onBlur(e, false)}
+            className="flex-2 bg-white"
+            style={fieldStyle(false)}
           >
             {COMMODITY_UNITS.map((u) => (
               <option key={u} value={u}>
@@ -181,7 +265,6 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
         </div>
       </section>
 
-      {/* Tag arrays: certifications + export licenses */}
       {[
         {
           label: 'Certifications',
@@ -204,21 +287,22 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
             <input
               value={val}
               onChange={(e) => setVal(e.target.value)}
+              onFocus={onFocus}
+              onBlur={(e) => onBlur(e, false)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
                   addTag(field, val)
                 }
               }}
-              className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg
-                         focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="flex-1"
               placeholder={`Add ${label.toLowerCase().slice(0, -1)} and press Enter`}
+              style={fieldStyle(false)}
             />
             <button
               type="button"
               onClick={() => addTag(field, val)}
-              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm
-                         rounded-lg flex items-center gap-1"
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm rounded-lg flex items-center gap-1"
             >
               <Plus size={14} /> Add
             </button>
@@ -228,12 +312,11 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
               {(form[field] as string[]).map((item) => (
                 <span
                   key={item}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs
-                    ${
-                      color === 'brand'
-                        ? 'bg-brand-50 text-brand-700 border border-brand-200'
-                        : 'bg-amber-50 text-amber-700 border border-amber-200'
-                    }`}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs ${
+                    color === 'brand'
+                      ? 'bg-brand-50 text-brand-700 border border-brand-200'
+                      : 'bg-amber-50 text-amber-700 border border-amber-200'
+                  }`}
                 >
                   {item}
                   <button
@@ -250,7 +333,6 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
         </section>
       ))}
 
-      {/* Banking */}
       <section>
         <div className="flex items-center gap-3 mb-3">
           <SectionTitle title="Banking Details" />
@@ -269,25 +351,30 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
             ] as const
           ).map(([f, lbl]) => (
             <div key={f} className={f === 'bankIban' ? 'col-span-2' : ''}>
-              <label className="block text-xs font-medium text-slate-600 mb-1">{lbl}</label>
+              <label style={labelStyle}>{lbl}</label>
               <input
                 value={form[f] ?? ''}
                 onChange={(e) => setField(f, e.target.value)}
-                className={cls(f)}
+                onFocus={onFocus}
+                onBlur={(e) => onBlur(e, false)}
+                className="w-full"
+                style={fieldStyle(false)}
               />
             </div>
           ))}
         </div>
       </section>
 
-      {/* Notes */}
       <section>
-        <label className="block text-xs font-medium text-slate-600 mb-1">Notes</label>
+        <label style={labelStyle}>Notes</label>
         <textarea
           value={form.notes ?? ''}
           onChange={(e) => setField('notes', e.target.value)}
+          onFocus={onFocus}
+          onBlur={(e) => onBlur(e, false)}
           rows={3}
-          className={`${cls('notes')} resize-none`}
+          className="w-full resize-none"
+          style={fieldStyle(false)}
         />
       </section>
 
@@ -295,15 +382,16 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-sm border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50"
+          className="transition-colors"
+          style={cancelBtnStyle}
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={saving}
-          className="px-6 py-2 text-sm bg-brand-600 hover:bg-brand-700 disabled:opacity-50
-                     text-white font-medium rounded-lg"
+          className="disabled:opacity-50 transition-colors"
+          style={primaryBtnStyle}
         >
           {saving ? 'Saving…' : isEdit ? 'Update Seller' : 'Add Seller'}
         </button>

@@ -1,6 +1,3 @@
-// src/renderer/src/components/ui/Pagination.tsx
-// Page navigation bar. Renders nothing if there is only one page.
-
 import type { PaginationMeta } from '../../lib/types'
 
 interface PaginationProps {
@@ -9,33 +6,59 @@ interface PaginationProps {
 }
 
 export function Pagination({ meta, onPageChange }: PaginationProps) {
-  // Don't render anything if there's only one page — no point showing navigation
   if (!meta || meta.totalPages <= 1) return null
 
   const { page, totalPages, total, pageSize } = meta
   const start = (page - 1) * pageSize + 1
   const end = Math.min(page * pageSize, total)
 
+  const btnBase: React.CSSProperties = {
+    height: '32px',
+    minWidth: '32px',
+    padding: '0 10px',
+    borderRadius: '8px',
+    border: `1px solid var(--color-slate-200)`,
+    background: 'var(--color-white)',
+    fontSize: '13px',
+    color: 'var(--color-ink-900)',
+    cursor: 'pointer'
+  }
+
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 text-sm text-slate-500">
-      <span>
-        Showing {start}–{end} of {total} records
+    <div
+      className="flex items-center justify-between px-4 py-3"
+      style={{ borderTop: `1px solid var(--color-slate-200)` }}
+    >
+      <span className="text-body-s" style={{ color: 'var(--color-slate-500)' }}>
+        Showing{' '}
+        <span className="font-mono">
+          {start}–{end}
+        </span>{' '}
+        of <span className="font-mono">{total}</span> records
       </span>
-      <div className="flex gap-1">
+      <div className="flex items-center gap-2">
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page === 1}
-          className="px-3 py-1 rounded border border-slate-200 disabled:opacity-40 hover:bg-slate-50 transition-colors"
+          style={{
+            ...btnBase,
+            opacity: page === 1 ? 0.4 : 1,
+            cursor: page === 1 ? 'not-allowed' : 'pointer'
+          }}
         >
           ‹ Prev
         </button>
-        <span className="px-3 py-1 text-slate-700 font-medium">
+        <span className="text-body-s font-medium" style={{ color: 'var(--color-ink-900)' }}>
           {page} / {totalPages}
         </span>
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page === totalPages}
-          className="px-3 py-1 rounded border border-slate-200 disabled:opacity-40 hover:bg-slate-50 transition-colors"
+          style={{
+            ...btnBase,
+            opacity: page === totalPages ? 0.4 : 1,
+            cursor: page === totalPages ? 'not-allowed' : 'pointer'
+          }}
         >
           Next ›
         </button>

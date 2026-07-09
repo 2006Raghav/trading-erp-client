@@ -79,7 +79,16 @@ export function BuyersPage() {
   // Each column's `render` receives (cellValue, fullRow) — use fullRow when you
   // need multiple fields (e.g. formatting quantity + unit together).
   const columns = [
-    { key: 'buyerCode', label: 'Code', width: 100 },
+    {
+      key: 'buyerCode',
+      label: 'Code',
+      width: 110,
+      render: (val: string) => (
+        <span className="font-mono text-body-s" style={{ color: 'var(--color-slate-500)' }}>
+          {val}
+        </span>
+      )
+    },
     { key: 'companyName', label: 'Company Name' },
     { key: 'contactPerson', label: 'Contact' },
     { key: 'country', label: 'Country', width: 130 },

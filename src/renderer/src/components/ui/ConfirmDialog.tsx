@@ -1,6 +1,3 @@
-// src/renderer/src/components/ui/ConfirmDialog.tsx
-// Reusable "are you sure?" dialog built on top of Modal.
-
 import { Modal } from './Modal'
 
 interface ConfirmDialogProps {
@@ -10,7 +7,7 @@ interface ConfirmDialogProps {
   title: string
   message: string
   confirmLabel?: string
-  danger?: boolean // true = red confirm button (destructive action)
+  danger?: boolean
 }
 
 export function ConfirmDialog({
@@ -24,11 +21,28 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
-      <p className="text-slate-600 text-sm mb-6">{message}</p>
+      <p className="text-body-m mb-6" style={{ color: 'var(--color-slate-500)' }}>
+        {message}
+      </p>
       <div className="flex justify-end gap-3">
         <button
           onClick={onClose}
-          className="px-4 py-2 text-sm border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors"
+          className="text-body-m font-semibold transition-colors"
+          style={{
+            height: '40px',
+            padding: '0 16px',
+            borderRadius: '8px',
+            border: `1px solid var(--color-slate-200)`,
+            background: 'var(--color-white)',
+            color: 'var(--color-ink-900)',
+            cursor: 'pointer'
+          }}
+          onMouseEnter={(e) => {
+            ;(e.currentTarget as HTMLElement).style.background = 'var(--color-canvas-50)'
+          }}
+          onMouseLeave={(e) => {
+            ;(e.currentTarget as HTMLElement).style.background = 'var(--color-white)'
+          }}
         >
           Cancel
         </button>
@@ -37,9 +51,25 @@ export function ConfirmDialog({
             onConfirm()
             onClose()
           }}
-          className={`px-4 py-2 text-sm rounded-lg text-white font-medium transition-colors ${
-            danger ? 'bg-red-600 hover:bg-red-700' : 'bg-brand-600 hover:bg-brand-700'
-          }`}
+          className="text-body-m font-semibold text-white transition-colors"
+          style={{
+            height: '40px',
+            padding: '0 16px',
+            borderRadius: '8px',
+            border: 'none',
+            background: danger ? 'var(--color-danger)' : 'var(--color-cobalt-600)',
+            cursor: 'pointer'
+          }}
+          onMouseEnter={(e) => {
+            ;(e.currentTarget as HTMLElement).style.background = danger
+              ? '#B91C1C'
+              : 'var(--color-cobalt-700)'
+          }}
+          onMouseLeave={(e) => {
+            ;(e.currentTarget as HTMLElement).style.background = danger
+              ? 'var(--color-danger)'
+              : 'var(--color-cobalt-600)'
+          }}
         >
           {confirmLabel}
         </button>
