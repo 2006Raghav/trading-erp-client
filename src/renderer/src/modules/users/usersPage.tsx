@@ -10,6 +10,7 @@ import { formatDate } from '../../lib/utils'
 import { useAuth } from '../auth/AuthContext'
 import type { User } from '../../lib/types'
 import { Plus, Search, Pencil, ToggleLeft, ToggleRight } from 'lucide-react'
+import { primaryBtnStyle } from '../cssUtils'
 
 export function UsersPage() {
   const { user: currentUser } = useAuth()
@@ -124,6 +125,7 @@ export function UsersPage() {
           onClick={() => setAddOpen(true)}
           className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700
                      text-white text-sm font-medium rounded-lg"
+          style={primaryBtnStyle}
         >
           <Plus size={16} /> Add User
         </button>

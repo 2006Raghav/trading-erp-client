@@ -11,6 +11,7 @@ import { useToast } from '../auth/ToastContext'
 import { formatCurrency, formatQuantity } from '../../lib/utils'
 import type { Product, ProductCategory, Seller, PaginationMeta } from '../../lib/types'
 import { Plus, Search, Pencil, Trash2, RefreshCw } from 'lucide-react'
+import { primaryBtnStyle } from '../cssUtils'
 
 export function ProductsPage() {
   const toast = useToast()
@@ -169,6 +170,7 @@ export function ProductsPage() {
           onClick={() => setAddOpen(true)}
           className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700
                      text-white text-sm font-medium rounded-lg"
+          style={primaryBtnStyle}
         >
           <Plus size={16} /> Add Product
         </button>

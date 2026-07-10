@@ -4,6 +4,13 @@ import { useToast } from '../auth/ToastContext'
 import { productsApi } from '../products/products.api'
 import { CREDIT_RATINGS, COMMODITY_UNITS } from '../../lib/constants'
 import type { Buyer, ProductCategory } from '../../lib/types'
+import {
+  primaryBtnStyle,
+  labelStyle,
+  cancelBtnStyle,
+  errorStyle,
+  sectionHeadingStyle
+} from '../cssUtils'
 
 interface BuyerFormProps {
   buyer?: Buyer
@@ -35,56 +42,6 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
     notes: buyer?.notes ?? '',
     interestIds: buyer?.interests?.map((i) => i.id) ?? []
   })
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '11px',
-    fontWeight: 600,
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase',
-    color: 'var(--color-slate-500)',
-    marginBottom: '6px'
-  }
-
-  const errorStyle: React.CSSProperties = {
-    fontSize: '13px',
-    color: 'var(--color-danger)',
-    marginTop: '4px'
-  }
-
-  const sectionHeadingStyle: React.CSSProperties = {
-    fontSize: '11px',
-    fontWeight: 600,
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase',
-    color: 'var(--color-slate-500)',
-    marginBottom: '12px'
-  }
-
-  const primaryBtnStyle: React.CSSProperties = {
-    height: '40px',
-    padding: '0 24px',
-    borderRadius: '8px',
-    background: 'var(--color-cobalt-600)',
-    color: '#fff',
-    fontSize: '14px',
-    fontWeight: 600,
-    border: 'none',
-    cursor: 'pointer'
-  }
-
-  const cancelBtnStyle: React.CSSProperties = {
-    height: '40px',
-    padding: '0 16px',
-    borderRadius: '8px',
-    background: 'var(--color-white)',
-    color: 'var(--color-ink-900)',
-    fontSize: '14px',
-    fontWeight: 500,
-    border: '1px solid var(--color-slate-200)',
-    cursor: 'pointer'
-  }
-
   useEffect(() => {
     productsApi
       .getCategories()

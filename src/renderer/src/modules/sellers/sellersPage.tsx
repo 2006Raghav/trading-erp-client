@@ -11,6 +11,7 @@ import { useToast } from '../auth/ToastContext'
 import { formatQuantity } from '../../lib/utils'
 import type { Seller, PaginationMeta } from '../../lib/types'
 import { Plus, Search, Eye, Pencil, Trash2, RefreshCw } from 'lucide-react'
+import { primaryBtnStyle } from '../cssUtils'
 
 export function SellersPage() {
   const toast = useToast()
@@ -152,6 +153,7 @@ export function SellersPage() {
           onClick={() => setAddOpen(true)}
           className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700
                      text-white text-sm font-medium rounded-lg transition-colors"
+          style={primaryBtnStyle}
         >
           <Plus size={16} /> Add Seller
         </button>

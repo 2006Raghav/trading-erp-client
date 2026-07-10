@@ -3,6 +3,7 @@ import { usersApi, type UserInput } from './users.api'
 import { useToast } from '../auth/ToastContext'
 import { USER_ROLES, ROLE_LABELS } from '../../lib/constants'
 import type { User } from '../../lib/types'
+import { primaryBtnStyle, labelStyle, cancelBtnStyle, errorStyle } from '../cssUtils'
 
 interface Props {
   user?: User
@@ -26,46 +27,6 @@ export function UserForm({ user, onSuccess, onCancel }: Props) {
     password: '',
     newPassword: ''
   })
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '11px',
-    fontWeight: 600,
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase',
-    color: 'var(--color-slate-500)',
-    marginBottom: '6px'
-  }
-
-  const errorStyle: React.CSSProperties = {
-    fontSize: '13px',
-    color: 'var(--color-danger)',
-    marginTop: '4px'
-  }
-
-  const primaryBtnStyle: React.CSSProperties = {
-    height: '40px',
-    padding: '0 24px',
-    borderRadius: '8px',
-    background: 'var(--color-cobalt-600)',
-    color: '#fff',
-    fontSize: '14px',
-    fontWeight: 600,
-    border: 'none',
-    cursor: 'pointer'
-  }
-
-  const cancelBtnStyle: React.CSSProperties = {
-    height: '40px',
-    padding: '0 16px',
-    borderRadius: '8px',
-    background: 'var(--color-white)',
-    color: 'var(--color-ink-900)',
-    fontSize: '14px',
-    fontWeight: 500,
-    border: '1px solid var(--color-slate-200)',
-    cursor: 'pointer'
-  }
 
   function setField<K extends keyof UserInput>(key: K, value: UserInput[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))

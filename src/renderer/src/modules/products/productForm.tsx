@@ -4,7 +4,7 @@ import { productsApi, type ProductInput } from './products.api'
 import { useToast } from '../auth/ToastContext'
 import { COMMODITY_UNITS, CURRENCIES } from '../../lib/constants'
 import type { Product, ProductCategory, Seller } from '../../lib/types'
-
+import { primaryBtnStyle, labelStyle, cancelBtnStyle, errorStyle } from '../cssUtils'
 interface ProductFormProps {
   product?: Product
   categories: ProductCategory[]
@@ -38,46 +38,6 @@ export function ProductForm({
     currency: product?.currency ?? 'USD',
     warehouseLocation: product?.warehouseLocation ?? ''
   })
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: '11px',
-    fontWeight: 600,
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase',
-    color: 'var(--color-slate-500)',
-    marginBottom: '6px'
-  }
-
-  const errorStyle: React.CSSProperties = {
-    fontSize: '13px',
-    color: 'var(--color-danger)',
-    marginTop: '4px'
-  }
-
-  const primaryBtnStyle: React.CSSProperties = {
-    height: '40px',
-    padding: '0 24px',
-    borderRadius: '8px',
-    background: 'var(--color-cobalt-600)',
-    color: '#fff',
-    fontSize: '14px',
-    fontWeight: 600,
-    border: 'none',
-    cursor: 'pointer'
-  }
-
-  const cancelBtnStyle: React.CSSProperties = {
-    height: '40px',
-    padding: '0 16px',
-    borderRadius: '8px',
-    background: 'var(--color-white)',
-    color: 'var(--color-ink-900)',
-    fontSize: '14px',
-    fontWeight: 500,
-    border: '1px solid var(--color-slate-200)',
-    cursor: 'pointer'
-  }
 
   function setField<K extends keyof ProductInput>(key: K, value: ProductInput[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))

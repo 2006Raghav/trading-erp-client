@@ -11,6 +11,7 @@ import { useToast } from '../auth/ToastContext'
 import { CREDIT_RATINGS } from '../../lib/constants'
 import type { Buyer, PaginationMeta } from '../../lib/types'
 import { Plus, Search, Filter, Eye, Pencil, Trash2, RefreshCw } from 'lucide-react'
+import { primaryBtnStyle } from '../cssUtils'
 
 export function BuyersPage() {
   const toast = useToast()
@@ -187,6 +188,7 @@ export function BuyersPage() {
           onClick={() => setAddOpen(true)}
           className="flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700
                      text-white text-sm font-medium rounded-lg transition-colors"
+          style={primaryBtnStyle}
         >
           <Plus size={16} /> Add Buyer
         </button>
