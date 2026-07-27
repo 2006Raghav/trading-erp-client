@@ -14,6 +14,7 @@ export interface SellerInput {
   contactPerson?: string
   email?: string
   phone?: string
+  password?: string
   factoryAddress?: string
   warehouseAddress?: string
   monthlyProductionCapacity?: number | string

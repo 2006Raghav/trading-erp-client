@@ -44,7 +44,8 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
     bankSwiftCode: seller?.bankSwiftCode ?? '',
     bankIban: seller?.bankIban ?? '',
     bankCountry: seller?.bankCountry ?? '',
-    notes: seller?.notes ?? ''
+    notes: seller?.notes ?? '',
+    password: ''
   })
 
   function setField<K extends keyof SellerInput>(key: K, value: SellerInput[K]) {
@@ -73,8 +74,23 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
 
   function validate(): boolean {
     const e: Record<string, string> = {}
+
     if (!form.companyName?.trim()) e.companyName = 'Company name is required'
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Invalid email'
+    if (!form.contactPerson?.trim()) e.contactPerson = 'Contact person is required'
+    if (!form.country?.trim()) e.country = 'Country is required'
+    if (!form.phone?.trim()) e.phone = 'Phone number is required'
+
+    if (!form.email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      e.email = 'Valid email is required'
+    }
+
+    // ONLY require password if creating a new seller
+    if (!isEdit) {
+      if (!form.password?.trim() || form.password.length < 6) {
+        e.password = 'Password must be at least 6 characters'
+      }
+    }
+
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -84,7 +100,19 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
     if (!validate()) return
     setSaving(true)
     try {
-      const res = isEdit ? await sellersApi.update(seller!.id, form) : await sellersApi.create(form)
+      // 1. Create a copy
+      const payload = { ...form }
+
+      // 2. Strip password if editing
+      if (isEdit) {
+        delete payload.password
+      }
+
+      // 3. Send payload instead of raw form state
+      const res = isEdit
+        ? await sellersApi.update(seller!.id, payload)
+        : await sellersApi.create(payload)
+
       if (res.success) onSuccess(res.data)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'An error occurred')
@@ -149,7 +177,9 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
           {(['country', 'contactPerson', 'email', 'phone'] as const).map((f) => (
             <div key={f}>
               <label style={labelStyle}>
-                {f === 'contactPerson' ? 'Contact Person' : f.charAt(0).toUpperCase() + f.slice(1)}
+                {f === 'contactPerson'
+                  ? 'Contact Person *'
+                  : f.charAt(0).toUpperCase() + f.slice(1) + ' *'}
               </label>
               <input
                 value={(form[f] as string) ?? ''}
@@ -163,6 +193,22 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
               {errors[f] && <p style={errorStyle}>{errors[f]}</p>}
             </div>
           ))}
+          {/* Render password ONLY when creating a new seller */}
+          {!isEdit && (
+            <div>
+              <label style={labelStyle}>Temporary Password *</label>
+              <input
+                type="password"
+                value={form.password ?? ''}
+                onChange={(e) => setField('password', e.target.value)}
+                onFocus={onFocus}
+                onBlur={(e) => onBlur(e, !!errors.password)}
+                className="w-full"
+                style={fieldStyle(!!errors.password)}
+              />
+              {errors.password && <p style={errorStyle}>{errors.password}</p>}
+            </div>
+          )}
         </div>
       </section>
 

@@ -54,6 +54,13 @@ export function ProductForm({
     if (!form.sellerId) e.sellerId = 'Seller is required'
     if (!form.categoryId) e.categoryId = 'Category is required'
     if (!form.productName?.trim()) e.productName = 'Product name is required'
+    if (form.purity?.trim()) {
+      const p = parseFloat(form.purity.replace('%', ''))
+      if (isNaN(p) || p < 0 || p > 100) {
+        e.purity = 'Must be between 0 and 100'
+      }
+    }
+
     if (form.availableQuantity && isNaN(Number(form.availableQuantity))) {
       e.availableQuantity = 'Must be a number'
     }

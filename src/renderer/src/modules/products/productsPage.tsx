@@ -6,7 +6,7 @@ import { Modal } from '../../components/ui/Modal'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
 import { ProductForm } from './productForm'
 import { productsApi, type ProductFilters } from './products.api'
-// import { sellersApi } from '../sellers/sellers.api'
+import { sellersApi } from '../sellers/sellers.api'
 import { useToast } from '../auth/ToastContext'
 import { formatCurrency, formatQuantity } from '../../lib/utils'
 import type { Product, ProductCategory, Seller, PaginationMeta } from '../../lib/types'
@@ -34,9 +34,9 @@ export function ProductsPage() {
     productsApi.getCategories().then((r) => {
       if (r.success) setCategories(r.data)
     })
-    // sellersApi.getAll({ pageSize: 200 }).then((r) => {
-    //   if (r.success) setSellers(r.data)
-    // })
+    sellersApi.getAll({ pageSize: 200 }).then((r) => {
+      if (r.success) setSellers(r.data)
+    })
   }, [])
 
   const fetchProducts = useCallback(async () => {
