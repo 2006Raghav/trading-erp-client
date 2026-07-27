@@ -16,6 +16,7 @@ export interface BuyerInput {
   country?: string
   email?: string
   phone?: string
+  password: string
   whatsapp?: string
   website?: string
   businessRegistrationNo?: string

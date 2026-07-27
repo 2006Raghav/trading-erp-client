@@ -32,6 +32,7 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
     country: buyer?.country ?? '',
     email: buyer?.email ?? '',
     phone: buyer?.phone ?? '',
+    password: '',
     whatsapp: buyer?.whatsapp ?? '',
     website: buyer?.website ?? '',
     businessRegistrationNo: buyer?.businessRegistrationNo ?? '',
@@ -72,10 +73,21 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
 
   function validateForm(): boolean {
     const e: Record<string, string> = {}
-    if (!form.companyName?.trim()) e.companyName = 'Company name is required'
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      e.email = 'Invalid email address'
+    if (!isEdit) {
+      if (!form.password?.trim() || form.password.length < 6) {
+        e.password = 'Password must be at least 6 characters'
+      }
     }
+    if (!form.companyName?.trim()) e.companyName = 'Company name is required'
+    if (!form.contactPerson?.trim()) e.contactPerson = 'Contact person is required'
+    if (!form.country?.trim()) e.country = 'Country is required'
+    if (!form.phone?.trim()) e.phone = 'Phone number is required'
+
+    // Email is now mandatory, check existence AND format
+    if (!form.email?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      e.email = 'Valid email is required'
+    }
+
     if (form.website && form.website.trim()) {
       try {
         new URL(form.website)
@@ -83,6 +95,7 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
         e.website = 'Invalid website URL'
       }
     }
+
     setErrors(e)
     return Object.keys(e).length === 0
   }
@@ -93,7 +106,17 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
 
     setSaving(true)
     try {
-      const res = isEdit ? await buyersApi.update(buyer!.id, form) : await buyersApi.create(form)
+      // Create a copy of the form data
+      const payload = { ...form }
+
+      if (isEdit) {
+        delete payload.password
+      }
+
+      const res = isEdit
+        ? await buyersApi.update(buyer!.id, payload)
+        : await buyersApi.create(payload)
+
       if (res.success) onSuccess(res.data)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'An error occurred')
@@ -163,10 +186,12 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
         <h4 style={sectionHeadingStyle}>Company Information</h4>
         <div className="grid grid-cols-2 gap-4">
           {buildField('companyName', 'Company Name *')}
-          {buildField('contactPerson', 'Contact Person')}
-          {buildField('country', 'Country')}
-          {buildField('email', 'Email', 'email')}
-          {buildField('phone', 'Phone')}
+          {buildField('contactPerson', 'Contact Person *')}
+          {buildField('country', 'Country *')}
+          {buildField('email', 'Email *', 'email')}
+          {buildField('phone', 'Phone *')}
+          {!isEdit && buildField('password', 'Temporary Password *', 'password')}{' '}
+          {/* Optional fields below */}
           {buildField('whatsapp', 'WhatsApp')}
           {buildField('website', 'Website', 'url', 'https://example.com')}
         </div>
