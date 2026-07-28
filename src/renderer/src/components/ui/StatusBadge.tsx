@@ -54,6 +54,71 @@ export function ActiveBadge({ isActive }: { isActive: boolean }) {
   )
 }
 
+/* ── KYC Status ─────────────────────────────────────────────────────────── */
+
+export type KycStatus = 'pending' | 'under_review' | 'approved' | 'rejected'
+
+const KYC_STYLES: Record<
+  KycStatus,
+  {
+    bg: string
+    text: string
+    label: string
+  }
+> = {
+  pending: {
+    bg: 'var(--color-warning-bg)',
+    text: 'var(--color-warning)',
+    label: 'Pending'
+  },
+
+  under_review: {
+    bg: 'var(--color-info-bg)',
+    text: 'var(--color-info)',
+    label: 'Under Review'
+  },
+
+  approved: {
+    bg: 'var(--color-success-bg)',
+    text: 'var(--color-success)',
+    label: 'Approved'
+  },
+
+  rejected: {
+    bg: 'var(--color-danger-bg)',
+    text: 'var(--color-danger)',
+    label: 'Rejected'
+  }
+}
+
+export function KycStatusBadge({ status }: { status: KycStatus | null }) {
+  const s = status ? KYC_STYLES[status] : KYC_STYLES.pending
+
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 text-caption uppercase"
+      style={{
+        background: s.bg,
+        color: s.text,
+        padding: '2px 10px',
+        borderRadius: '9999px',
+        lineHeight: '16px'
+      }}
+    >
+      <span
+        style={{
+          width: 8,
+          height: 8,
+          borderRadius: '50%',
+          display: 'inline-block',
+          background: s.text
+        }}
+      />
+      {s.label}
+    </span>
+  )
+}
+
 /* ── Role Badge ──────────────────────────────────────────────────────────── */
 export function RoleBadge({ role }: { role: string }) {
   return (
