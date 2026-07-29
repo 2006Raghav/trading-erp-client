@@ -13,7 +13,7 @@ function createWindow(): void {
     height: 900,
     minWidth: 1100,
     minHeight: 700,
-    title: 'Trading ERP',
+    title: 'Xclamation ERP',
     webPreferences: {
       // preload.js runs in a privileged context between Node and the web page.
       // It can use Electron APIs and expose a safe, limited surface to the renderer.
