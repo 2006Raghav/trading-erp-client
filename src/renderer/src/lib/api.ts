@@ -1,6 +1,9 @@
 import { tokenStorage } from '../platform'
 
-const BASE = 'https://xclamation-server.onrender.com'
+const BASE =
+  ((window as any).electron
+    ? (import.meta.env as any).VITE_API_URL_ELECTRON
+    : import.meta.env.VITE_API_URL) || 'http://localhost:4000'
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
   const token = tokenStorage.get()
