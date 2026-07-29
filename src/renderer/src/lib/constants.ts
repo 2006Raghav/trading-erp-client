@@ -19,10 +19,10 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 // This is UX-only enforcement — the server enforces permissions on every API call.
 // A motivated user could bypass this client-side check, but the server will 403 them.
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  admin: ['dashboard', 'buyers', 'sellers', 'products', 'users'],
-  sales: ['dashboard', 'buyers', 'sellers', 'products'],
-  accounts: ['dashboard', 'buyers', 'sellers'],
-  documents: ['dashboard', 'buyers', 'sellers', 'products']
+  admin: ['dashboard', 'buyers', 'sellers', 'products', 'users', 'marketplace', 'kyc'],
+  sales: ['dashboard', 'buyers', 'sellers', 'products', 'marketplace'],
+  accounts: ['dashboard', 'buyers', 'sellers', 'marketplace'],
+  documents: ['dashboard', 'buyers', 'sellers', 'marketplace', 'products']
 }
 
 // Credit rating options for buyer forms and filters
