@@ -16,7 +16,7 @@ import { Separator } from '../../components/ui/separator'
 
 import type { MarketplaceProduct } from './marketplace.api'
 
-import { formatCurrency, formatQuantity } from '../../lib/utils'
+import { formatQuantity } from '../../lib/utils'
 
 interface MarketplaceCardProps {
   product: MarketplaceProduct

@@ -9,25 +9,25 @@ interface Props {
   user?: User
   onSuccess: (user: User) => void
   onCancel: () => void
+  modifier: string
 }
 
-export function UserForm({ user, onSuccess, onCancel }: Props) {
+export function UserForm({ user, onSuccess, onCancel, modifier }: Props) {
   const toast = useToast()
   const isEdit = !!user
 
   const [saving, setSaving] = useState(false)
   const [showPw, setShowPw] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-
   const [form, setForm] = useState<UserInput>({
     fullName: user?.fullName ?? '',
-    username: user?.username ?? '',
+    username: (user as any)?.username ?? '',
     email: user?.email ?? '',
-    role: user?.role ?? 'sales',
+    role: (user as any)?.role ?? 'sales',
     password: '',
-    newPassword: ''
+    newPassword: '',
+    createdBy: modifier
   })
-
   function setField<K extends keyof UserInput>(key: K, value: UserInput[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (errors[key])
@@ -37,18 +37,34 @@ export function UserForm({ user, onSuccess, onCancel }: Props) {
         return e
       })
   }
-
   function validate(): boolean {
     const e: Record<string, string> = {}
+
     if (!form.fullName?.trim()) e.fullName = 'Full name is required'
     if (!form.username?.trim()) e.username = 'Username is required'
     if (!form.role) e.role = 'Role is required'
-    if (!isEdit && !form.password?.trim()) e.password = 'Password is required'
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Invalid email'
+
+    if (!form.email?.trim()) {
+      e.email = 'Email is required'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      e.email = 'Invalid email'
+    }
+
+    if (!isEdit) {
+      if (!form.password?.trim()) {
+        e.password = 'Password is required'
+      } else if (form.password.length < 8) {
+        e.password = 'Password must be at least 8 characters'
+      }
+    } else if (isEdit && form.newPassword && form.newPassword.length > 0) {
+      if (form.newPassword.length < 8) {
+        e.newPassword = 'Password must be at least 8 characters'
+      }
+    }
+
     setErrors(e)
     return Object.keys(e).length === 0
   }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!validate()) return
@@ -125,7 +141,7 @@ export function UserForm({ user, onSuccess, onCancel }: Props) {
           {errors.username && <p style={errorStyle}>{errors.username}</p>}
         </div>
         <div>
-          <label style={labelStyle}>Email</label>
+          <label style={labelStyle}>Email *</label>{' '}
           <input
             type="email"
             value={form.email ?? ''}

@@ -24,15 +24,16 @@ export function RejectionModal({ isOpen, onClose, onConfirm, isSubmitting }: Rej
   useEffect(() => {
     if (isOpen) {
       setReason('')
-    } else {
-      // THE FAILSAFE: Forcefully clear the Shadcn body lock 100ms after the modal closes.
-      // This guarantees your screen will never freeze, even if Shadcn crashes internally.
-      const timer = setTimeout(() => {
-        document.body.style.pointerEvents = ''
-        document.body.removeAttribute('data-scroll-locked')
-      }, 100)
-      return () => clearTimeout(timer)
+      return undefined
     }
+
+    // THE FAILSAFE: Forcefully clear the Shadcn body lock 100ms after the modal closes.
+    // This guarantees your screen will never freeze, even if Shadcn crashes internally.
+    const timer = setTimeout(() => {
+      document.body.style.pointerEvents = ''
+      document.body.removeAttribute('data-scroll-locked')
+    }, 100)
+    return () => clearTimeout(timer)
   }, [isOpen])
 
   return (

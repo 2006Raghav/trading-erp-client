@@ -1,5 +1,5 @@
 import { api } from '../../lib/api'
-import type { Buyer, ApiSuccess, ApiSuccessList, ProductCategory } from '../../lib/types'
+import type { Buyer, ApiSuccess, ApiSuccessList } from '../../lib/types'
 
 // ── Filter shape sent as query params to GET /api/buyers ──────────────────────
 export interface BuyerFilters {

@@ -34,7 +34,6 @@ export function UsersPage() {
       setLoading(false)
     }
   }, [search])
-
   useEffect(() => {
     fetchUsers()
   }, [fetchUsers])
@@ -141,14 +140,19 @@ export function UsersPage() {
       </div>
 
       <Modal isOpen={addOpen} onClose={() => setAddOpen(false)} title="Add New User" size="md">
-        <UserForm
-          onSuccess={() => {
-            setAddOpen(false)
-            fetchUsers()
-            toast.success('User created')
-          }}
-          onCancel={() => setAddOpen(false)}
-        />
+        {currentUser ? (
+          <UserForm
+            onSuccess={() => {
+              setAddOpen(false)
+              fetchUsers()
+              toast.success('User created')
+            }}
+            onCancel={() => setAddOpen(false)}
+            modifier={currentUser.id}
+          />
+        ) : (
+          <div>Loading...</div>
+        )}
       </Modal>
 
       <Modal isOpen={!!editTarget} onClose={() => setEditTarget(null)} title="Edit User" size="md">
@@ -161,6 +165,7 @@ export function UsersPage() {
               toast.success('User updated')
             }}
             onCancel={() => setEditTarget(null)}
+            modifier={currentUser?.id as string}
           />
         )}
       </Modal>

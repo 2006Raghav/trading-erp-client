@@ -110,7 +110,7 @@ export function BuyerForm({ buyer, onSuccess, onCancel }: BuyerFormProps) {
       const payload = { ...form }
 
       if (isEdit) {
-        delete payload.password
+        delete (payload as Partial<typeof payload>).password
       }
 
       const res = isEdit

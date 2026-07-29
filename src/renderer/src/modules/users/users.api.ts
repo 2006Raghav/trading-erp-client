@@ -8,6 +8,7 @@ export interface UserInput {
   role: string
   password?: string
   newPassword?: string
+  createdBy?: string
 }
 
 export interface UserFilters {

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { Search, RefreshCw, PackageSearch, Plus, Loader2 } from 'lucide-react'
+import { RefreshCw, PackageSearch, Plus, Loader2 } from 'lucide-react'
 
 import { Button } from '../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card'

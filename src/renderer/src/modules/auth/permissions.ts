@@ -6,7 +6,7 @@ const BUYER_PERMISSIONS: readonly string[] = [
   'buyer-profile',
   'buyer-orders',
   'buyer-documents',
-  'marketplace' // <-- ADDED: Grants access to the marketplace
+  'marketplace'
 ]
 
 const SELLER_PERMISSIONS: readonly string[] = [
@@ -15,7 +15,7 @@ const SELLER_PERMISSIONS: readonly string[] = [
   'seller-products',
   'seller-orders',
   'seller-documents',
-  'marketplace' // <-- ADDED: Grants access to the marketplace
+  'marketplace'
 ]
 
 export function hasPermission(user: User | null, module: string): boolean {
