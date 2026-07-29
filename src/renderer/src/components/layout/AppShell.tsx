@@ -4,7 +4,7 @@ import { Header } from './Header'
 
 export function AppShell() {
   return (
-    <div className="flex h-screen bg-slate-100 overflow-hidden">
+    <div className="flex h-screen bg-canvas-50 overflow-hidden">
       {/* Fixed-width sidebar — never scrolls */}
       <Sidebar />
 

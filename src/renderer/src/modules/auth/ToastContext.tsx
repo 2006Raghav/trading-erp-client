@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 
-// ── Types ─────────────────────────────────────────────────────────────────────
 type ToastType = 'success' | 'error' | 'info' | 'warning'
 
 interface Toast {
@@ -16,26 +15,14 @@ interface ToastContextValue {
   warning: (msg: string) => void
 }
 
-// ── Styles ────────────────────────────────────────────────────────────────────
-// Background + text color per toast type
-const TYPE_STYLES: Record<ToastType, string> = {
-  success: 'bg-green-600 text-white',
-  error: 'bg-red-600   text-white',
-  info: 'bg-blue-600  text-white',
-  warning: 'bg-amber-500 text-white'
+const TOAST_STYLES: Record<ToastType, { bg: string; text: string; icon: string }> = {
+  success: { bg: 'var(--color-success)', text: '#fff', icon: '✓' },
+  error: { bg: 'var(--color-danger)', text: '#fff', icon: '✕' },
+  info: { bg: 'var(--color-info)', text: '#fff', icon: 'ℹ' },
+  warning: { bg: 'var(--color-warning)', text: '#fff', icon: '⚠' }
 }
 
-// Icon per toast type — simple text characters, no icon library needed
-const TYPE_ICONS: Record<ToastType, string> = {
-  success: '✓',
-  error: '✕',
-  info: 'ℹ',
-  warning: '⚠'
-}
-
-// ── Duration (ms) per type ────────────────────────────────────────────────────
-// Errors stay longer because they require user attention
-const TYPE_DURATION: Record<ToastType, number> = {
+const DURATION: Record<ToastType, number> = {
   success: 3500,
   error: 5000,
   info: 3500,
@@ -44,60 +31,58 @@ const TYPE_DURATION: Record<ToastType, number> = {
 
 const ToastContext = createContext<ToastContextValue | null>(null)
 
-// ── Provider ──────────────────────────────────────────────────────────────────
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
-  // addToast: creates a toast, adds it to state, schedules its removal
-  const addToast = useCallback((message: string, type: ToastType) => {
-    // Use timestamp + random to avoid ID collisions when multiple toasts
-    // are created in rapid succession (e.g. form validation fires 3 errors at once)
+  const add = useCallback((message: string, type: ToastType) => {
     const id = Date.now() + Math.random()
     setToasts((prev) => [...prev, { id, message, type }])
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), TYPE_DURATION[type])
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), DURATION[type])
   }, [])
 
-  // Expose typed convenience methods instead of addToast(msg, type)
   const value: ToastContextValue = {
-    success: (msg) => addToast(msg, 'success'),
-    error: (msg) => addToast(msg, 'error'),
-    info: (msg) => addToast(msg, 'info'),
-    warning: (msg) => addToast(msg, 'warning')
+    success: (msg) => add(msg, 'success'),
+    error: (msg) => add(msg, 'error'),
+    info: (msg) => add(msg, 'info'),
+    warning: (msg) => add(msg, 'warning')
   }
 
   return (
     <ToastContext.Provider value={value}>
       {children}
-      {/* Toast container renders outside the normal flow — fixed position bottom-right */}
-      <ToastContainer toasts={toasts} />
+      {toasts.length > 0 && (
+        <div className="fixed bottom-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none">
+          {toasts.map((t) => {
+            const s = TOAST_STYLES[t.type]
+            return (
+              <div
+                key={t.id}
+                className="flex items-center gap-3 animate-slide-in"
+                style={{
+                  background: s.bg,
+                  color: s.text,
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  minWidth: '260px',
+                  maxWidth: '380px',
+                  boxShadow: 'var(--shadow-modal)'
+                }}
+              >
+                <span style={{ fontSize: '16px', lineHeight: 1 }}>{s.icon}</span>
+                {t.message}
+              </div>
+            )
+          })}
+        </div>
+      )}
     </ToastContext.Provider>
   )
 }
 
-// ── Container ─────────────────────────────────────────────────────────────────
-// Rendered by ToastProvider — stacks toasts from the bottom up
-function ToastContainer({ toasts }: { toasts: Toast[] }) {
-  if (!toasts.length) return null
-  return (
-    <div className="fixed bottom-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none">
-      {toasts.map((t) => (
-        <div
-          key={t.id}
-          className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg
-            text-sm font-medium min-w-64 max-w-sm
-            animate-[slideIn_0.2s_ease-out] ${TYPE_STYLES[t.type]}`}
-        >
-          <span className="text-base leading-none">{TYPE_ICONS[t.type]}</span>
-          {t.message}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ── Hook ──────────────────────────────────────────────────────────────────────
 export function useToast(): ToastContextValue {
   const ctx = useContext(ToastContext)
-  if (!ctx) throw new Error('useToast must be used inside <ToastProvider>')
+  if (!ctx) throw new Error('useToast must be inside ToastProvider')
   return ctx
 }
