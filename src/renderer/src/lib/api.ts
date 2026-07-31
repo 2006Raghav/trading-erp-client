@@ -1,8 +1,8 @@
 import { tokenStorage } from '../platform'
 
 const BASE =
-  (window.electron
-    ? (import.meta.env as any).VITE_API_URL_ELECTRON
+  ((window as any).electron
+    ? (import.meta.env as any).VITE_PROD_URL_ELECTRON
     : import.meta.env.VITE_API_URL) || 'http://localhost:4000'
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
@@ -15,7 +15,6 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
     },
     body: body ? JSON.stringify(body) : undefined
   })
-  console.log('API request:', { method, path, body, res })
   if (res.status === 401) {
     tokenStorage.clear()
     window.location.hash = '/login'

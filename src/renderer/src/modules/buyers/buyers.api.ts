@@ -1,7 +1,7 @@
-import { api } from '../../lib/apiClient'
+import { api } from '../../lib/api'
 import type { Buyer, ApiSuccess, ApiSuccessList } from '../../lib/types'
 
-// ── Filter shape — sent as query string to GET /api/buyers ────────────────────
+// ── Filter shape sent as query params to GET /api/buyers ──────────────────────
 export interface BuyerFilters {
   search?: string
   creditRating?: string
@@ -9,13 +9,14 @@ export interface BuyerFilters {
   pageSize?: number
 }
 
-// ── Input shape — sent as JSON body to POST/PUT /api/buyers ──────────────────
+// ── Input shape sent in POST /api/buyers body ─────────────────────────────────
 export interface BuyerInput {
   companyName: string
   contactPerson?: string
   country?: string
   email?: string
   phone?: string
+  password: string
   whatsapp?: string
   website?: string
   businessRegistrationNo?: string
@@ -27,30 +28,27 @@ export interface BuyerInput {
   interestIds: string[]
 }
 
-// ── API call functions ────────────────────────────────────────────────────────
-// Each function maps 1:1 to a server route.
-// Return types match the { success, data } / { success, data, meta } shape
-// the Fastify server always returns.
-
 export const buyersApi = {
   /** GET /api/buyers?search=...&page=... */
   getAll: (filters: BuyerFilters = {}) =>
-    api.request<ApiSuccessList<Buyer>>('GET', `/api/buyers?${api.qs(filters as Record<string, unknown>)}`),
+    api.request<ApiSuccessList<Buyer>>(
+      'GET',
+      `/buyers?${api.qs(filters as Record<string, string>)}`
+    ),
 
   /** GET /api/buyers/:id */
-  getById: (id: string) => api.request<ApiSuccess<Buyer>>('GET', `/api/buyers/${id}`),
+  getById: (id: string) => api.request<ApiSuccess<Buyer>>('GET', `/buyers/${id}`),
 
-  /** GET /api/buyers/:id/history — returns activity log entries for this buyer */
-  getHistory: (id: string) =>
-    api.request<ApiSuccess<unknown[]>>('GET', `/api/buyers/${id}/history`),
+  /** GET /api/buyers/:id/history */
+  getHistory: (id: string) => api.request<ApiSuccess<unknown[]>>('GET', `/buyers/${id}/history`),
 
   /** POST /api/buyers */
-  create: (data: BuyerInput) => api.request<ApiSuccess<Buyer>>('POST', '/api/buyers', data),
+  create: (data: BuyerInput) => api.request<ApiSuccess<Buyer>>('POST', '/buyers', data),
 
   /** PUT /api/buyers/:id */
   update: (id: string, data: BuyerInput) =>
-    api.request<ApiSuccess<Buyer>>('PUT', `/api/buyers/${id}`, data),
+    api.request<ApiSuccess<Buyer>>('PUT', `/buyers/${id}`, data),
 
-  /** DELETE /api/buyers/:id (soft delete on server) */
-  remove: (id: string) => api.request<{ success: boolean }>('DELETE', `/api/buyers/${id}`)
+  /** DELETE /api/buyers/:id (soft delete) */
+  remove: (id: string) => api.request<{ success: boolean }>('DELETE', `/buyers/${id}`)
 }
