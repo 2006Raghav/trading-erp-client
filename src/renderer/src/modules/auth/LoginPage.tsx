@@ -19,11 +19,7 @@ export function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-<<<<<<< HEAD
     if (!identifier.trim() || !password.trim()) {
-=======
-    if (!username.trim() || !password.trim()) {
->>>>>>> e6d320d7971f0682e0381dca4b5bdd57a676e474
       setError('Enter your username and password.')
       return
     }
