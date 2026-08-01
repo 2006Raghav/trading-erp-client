@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from './AuthContext'
 
 export function LoginPage() {
-  const [username, setUsername] = useState('')
+  const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -19,13 +19,13 @@ export function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!username.trim() || !password.trim()) {
+    if (!identifier.trim() || !password.trim()) {
       setError('Enter your username and password.')
       return
     }
     setLoading(true)
     setError('')
-    const result = await login(username.trim(), password)
+    const result = await login(identifier.trim(), password)
     setLoading(false)
     if (!result.success) setError(result.error || 'Login failed. Check your credentials.')
   }
@@ -100,17 +100,25 @@ export function LoginPage() {
           )}
 
           <div className="space-y-4">
+            {' '}
+            <h1 className="text-2xl font-bold text-ink-900 mb-1">Sign in</h1>
+            <p className="text-slate-500 text-sm mb-8">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-cobalt-600 hover:text-cobalt-700 font-medium">
+                Register
+              </Link>
+            </p>
             <div>
               <label
                 className="block text-caption uppercase mb-1.5"
                 style={{ color: 'var(--color-slate-500)' }}
               >
-                Username
+                Username or Email
               </label>
               <input
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 style={inputStyle}
                 placeholder="your.username"
                 autoFocus
@@ -123,7 +131,6 @@ export function LoginPage() {
                 }}
               />
             </div>
-
             <div>
               <label
                 className="block text-caption uppercase mb-1.5"
@@ -145,7 +152,6 @@ export function LoginPage() {
                 }}
               />
             </div>
-
             <button
               type="submit"
               disabled={loading}

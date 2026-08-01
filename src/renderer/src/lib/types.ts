@@ -2,16 +2,50 @@
 // Entity types shared across modules.
 // These mirror the camelCase shapes that the Fastify server returns in JSON.
 
-export interface User {
+export type InternalRole = 'admin' | 'sales' | 'accounts' | 'documents'
+
+export interface InternalUser {
   id: string
+  userType: 'internal'
+
   username: string
   fullName: string
   email: string | null
-  role: 'admin' | 'sales' | 'accounts' | 'documents'
+
+  role: InternalRole
+
   isActive: boolean
   lastLoginAt: string | null
   createdAt: string
 }
+
+export interface BuyerUser {
+  id: string
+  userType: 'buyer'
+
+  buyerId: string
+
+  companyName: string
+  fullName: string
+  email: string | null
+
+  isActive: boolean
+}
+
+export interface SellerUser {
+  id: string
+  userType: 'seller'
+
+  sellerId: string
+
+  companyName: string
+  fullName: string
+  email: string | null
+
+  isActive: boolean
+}
+
+export type User = InternalUser | BuyerUser | SellerUser
 
 export interface Buyer {
   id: string

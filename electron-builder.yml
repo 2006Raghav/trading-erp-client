@@ -1,4 +1,4 @@
-appId: com.yourcompany.trading-erp
+appId: com.xclamation.trading-erp
 productName: Trading ERP
 copyright: Copyright © 2025 Your Company
 
@@ -18,10 +18,11 @@ win:
 
 nsis:
   oneClick: false
+  perMachine: true
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: Trading ERP
+  shortcutName: Xclamation
 
 mac:
   target: dmg

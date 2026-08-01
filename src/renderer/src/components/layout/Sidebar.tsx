@@ -10,6 +10,8 @@ import {
   DollarSign,
   UserCog,
   LogOut,
+  ShieldCheck,
+  Store,
   type LucideIcon
 } from 'lucide-react'
 
@@ -22,11 +24,18 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, module: null },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, module: 'dashboard' },
   { to: '/buyers', label: 'Buyers', icon: Users2, module: 'buyers' },
   { to: '/sellers', label: 'Sellers', icon: Building2, module: 'sellers' },
   { to: '/products', label: 'Products', icon: Package, module: 'products' },
+  {
+    to: '/marketplace',
+    label: 'Marketplace',
+    icon: Store,
+    module: 'marketplace'
+  },
   { to: '/users', label: 'Users', icon: UserCog, module: 'users' },
+  { to: '/kyc', label: 'KYC Queue', icon: ShieldCheck, module: 'kyc' },
   { to: '/inquiries', label: 'Inquiries', icon: FileText, module: 'inquiries', disabled: true },
   { to: '/shipments', label: 'Shipments', icon: Ship, module: 'shipments', disabled: true },
   { to: '/payments', label: 'Payments', icon: DollarSign, module: 'payments', disabled: true }
@@ -34,7 +43,7 @@ const NAV_ITEMS: NavItem[] = [
 
 // Deterministic avatar color from entity name — §5.5
 const AVATAR_PALETTES = [
-  { bg: 'bg-cobalt-100', text: 'text-cobalt-700' },
+  { bg: 'bg-cobalt-100', text: 'text-cobalt-200' },
   { bg: 'bg-[#FEF9E7]', text: 'text-[#C9962E]' }, // gold tint
   { bg: 'bg-[#FDF0EC]', text: 'text-[#BE5F3D]' }, // copper tint
   { bg: 'bg-slate-200', text: 'text-ink-900' }
@@ -50,8 +59,11 @@ export function avatarPalette(name?: string) {
 
 export function Sidebar() {
   const { user, can, logout } = useAuth()
-  const palette = user?.fullName ? avatarPalette(user.fullName) : AVATAR_PALETTES[1]
-  const initial = user?.fullName?.charAt(0).toUpperCase() ?? '?'
+  const displayName = user?.userType === 'internal' ? user.fullName : user?.companyName
+
+  const palette = avatarPalette(displayName)
+
+  const initial = displayName?.charAt(0).toUpperCase() ?? '?'
 
   return (
     <aside
@@ -84,8 +96,9 @@ export function Sidebar() {
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto no-scrollbar">
         {' '}
         {NAV_ITEMS.map(({ to, label, icon: Icon, module, disabled }) => {
-          if (module && !can(module) && !disabled) return null
-
+          if (module && !disabled && !can(module)) {
+            return null
+          }
           if (disabled) {
             return (
               <div
@@ -161,15 +174,17 @@ export function Sidebar() {
             {initial}
           </div>
           <div className="min-w-0">
-            <p className="text-body-s font-medium text-white truncate">{user?.fullName}</p>
+            <p className="text-body-s font-medium text-white truncate">{displayName}</p>{' '}
             <p className="text-caption capitalize" style={{ color: 'var(--color-slate-500)' }}>
-              {user?.role}
+              {user?.userType === 'internal' ? user.role : user?.userType}
             </p>
           </div>
         </div>
 
         <button
-          onClick={logout}
+          onClick={async () => {
+            await logout()
+          }}
           className="flex items-center gap-3 w-full px-3 text-body-m transition-colors"
           style={{
             height: '40px',

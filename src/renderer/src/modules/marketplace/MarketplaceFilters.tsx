@@ -1,6 +1,6 @@
 // src/renderer/src/modules/marketplace/MarketplaceFilters.tsx
 
-import { RotateCcw, Search } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 
 import { Input } from '../../components/ui/input'
 import { Button } from '../../components/ui/button'

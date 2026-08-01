@@ -12,6 +12,10 @@ import { BuyersPage } from './modules/buyers/buyersPage'
 import { SellersPage } from './modules/sellers/sellersPage'
 import { ProductsPage } from './modules/products/productsPage'
 import { UsersPage } from './modules/users/usersPage'
+import { RegistrationPage } from './modules/registration/RegistrationPage'
+import { KycQueuePage } from './modules/kyc/kycQueuePage'
+import { MarketplacePage } from './modules/marketplace/MarketplacePage'
+import KycDetail from './modules/kyc/KycDetail'
 
 export default function App() {
   return (
@@ -23,7 +27,7 @@ export default function App() {
         <Routes>
           {/* Public route — accessible without a token */}
           <Route path="/login" element={<LoginPage />} />
-
+          <Route path="/register" element={<RegistrationPage />} />
           {/* Protected shell — all routes inside require a valid session.
               AppShell renders the sidebar + header + <Outlet /> (child route content). */}
           <Route
@@ -35,14 +39,21 @@ export default function App() {
           >
             {/* Default: redirect root to dashboard */}
             <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
+            {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
             {/* Module routes: ProtectedRoute with `require` also checks role permission */}
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute require="dashboard">
+                  <DashboardPage />
+                </ProtectedRoute>
+              }
+            />{' '}
             <Route
               path="/buyers/*"
               element={
                 <ProtectedRoute require="buyers">
-                  {' '}
-                  <BuyersPage />{' '}
+                  <BuyersPage />
                 </ProtectedRoute>
               }
             />
@@ -50,8 +61,7 @@ export default function App() {
               path="/sellers/*"
               element={
                 <ProtectedRoute require="sellers">
-                  {' '}
-                  <SellersPage />{' '}
+                  <SellersPage />
                 </ProtectedRoute>
               }
             />
@@ -64,16 +74,31 @@ export default function App() {
               }
             />
             <Route
+              path="/kyc/*"
+              element={
+                <ProtectedRoute require="kyc">
+                  <KycQueuePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/kyc/:entity/:id" element={<KycDetail />} />
+            <Route
+              path="/marketplace/*"
+              element={
+                <ProtectedRoute require="marketplace">
+                  <MarketplacePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/users/*"
               element={
                 <ProtectedRoute require="users">
-                  {' '}
-                  <UsersPage />{' '}
+                  <UsersPage />
                 </ProtectedRoute>
               }
             />
           </Route>
-
           {/* Catch-all: unknown URL → dashboard */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>

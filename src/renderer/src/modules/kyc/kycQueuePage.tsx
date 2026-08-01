@@ -3,16 +3,7 @@
 
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  Search,
-  CheckCircle2,
-  Clock3,
-  XCircle,
-  ShieldCheck,
-  Eye,
-  Filter,
-  RefreshCcw
-} from 'lucide-react'
+import { Search, CheckCircle2, Clock3, XCircle, ShieldCheck, Eye, RefreshCcw } from 'lucide-react'
 
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
@@ -51,7 +42,7 @@ import { useToast } from '../auth/ToastContext'
 import { kycApi, type KycEntity, type KycStatus, type KycQueueItem } from './kyc.api'
 import { useCallback, useEffect } from 'react'
 import { useKycActions } from './useKycActions'
-import { RejectionModal } from './rejectionModal' // Note: Ensure this matches the casing of your file!
+import { RejectionModal } from './rejectionModal'
 
 type EntityFilter = 'all' | 'buyer' | 'seller'
 type StatusFilter = 'all' | 'pending' | 'under_review' | 'approved' | 'rejected'

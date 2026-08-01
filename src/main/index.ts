@@ -1,11 +1,20 @@
 // src/main/index.ts
-//
-// THE COMPLETE AND FINAL MAIN PROCESS FILE.
-// Nothing is added here in V1. No IPC handlers for data. No SQLite.
-// The renderer (React) talks directly to the Fastify server over HTTP.
 
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, shell, protocol, net } from 'electron'
 import path from 'path'
+import { pathToFileURL } from 'url'
+
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'app',
+    privileges: {
+      secure: true, // treated as HTTPS-equivalent (enables fetch, Service Workers)
+      standard: true, // URL parsing follows standard rules → origin = app://trading-erp
+      supportFetchAPI: true, // fetch() calls work from within this scheme
+      corsEnabled: true // this scheme participates in standard CORS negotiation
+    }
+  }
+])
 
 function createWindow(): void {
   const win = new BrowserWindow({
@@ -13,7 +22,7 @@ function createWindow(): void {
     height: 900,
     minWidth: 1100,
     minHeight: 700,
-    title: 'Trading ERP',
+    title: 'Xclamation ERP',
     webPreferences: {
       // preload.js runs in a privileged context between Node and the web page.
       // It can use Electron APIs and expose a safe, limited surface to the renderer.
@@ -47,10 +56,23 @@ function createWindow(): void {
 }
 
 // Wait for Electron to be ready before creating the window.
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  // ── Serve renderer files through the app:// protocol ────────────────
+  // Maps  app://trading-erp/<path>  →  dist/renderer/<path>
+  // HashRouter means all actual routing is in the URL hash (#/login, #/dashboard),
+  // so every navigation still resolves to index.html — no 404 on refresh.
+  const RENDERER_ROOT = path.join(__dirname, '../renderer')
 
-// On Windows/Linux: quit when all windows are closed.
-// On macOS: stay in the dock (standard macOS behaviour).
+  protocol.handle('app', (request) => {
+    const { pathname } = new URL(request.url)
+    const relativePath = pathname.slice(1) || 'index.html'
+    const filePath = path.join(RENDERER_ROOT, relativePath)
+    return net.fetch(pathToFileURL(filePath).toString())
+  })
+
+  createWindow()
+})
+
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
 })

@@ -9,8 +9,6 @@ import {
   User,
   Mail,
   Phone,
-  Globe,
-  Calendar,
   ShieldCheck,
   FileText,
   Clock3,
@@ -83,6 +81,14 @@ export default function KycDetail() {
         <Skeleton className="h-52 w-full" />
 
         <Skeleton className="h-96 w-full" />
+      </div>
+    )
+  }
+
+  if (!company) {
+    return (
+      <div className="flex h-64 items-center justify-center text-muted-foreground">
+        KYC Application not found.
       </div>
     )
   }

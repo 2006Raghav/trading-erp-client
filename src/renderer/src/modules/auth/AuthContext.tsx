@@ -5,7 +5,8 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import { tokenStorage } from '../../platform'
-import { ROLE_PERMISSIONS } from '../../lib/constants'
+import { hasPermission } from './permissions'
+import type { InternalUser } from '../../lib/types'
 import { authApi } from './auth.api'
 import type { User } from '../../lib/types'
 
@@ -13,11 +14,14 @@ import type { User } from '../../lib/types'
 interface AuthContextValue {
   user: User | null // null when not logged in
   loading: boolean // true while we check for a stored token on app start
-  login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>
+  login: (identifier: string, password: string) => Promise<{ success: boolean; error?: string }>
   logout: () => Promise<void>
   // Returns true if the current user's role has access to the given module name.
   // Used by ProtectedRoute and Sidebar to hide/show routes and nav items.
   can: (module: string) => boolean
+  isInternal: boolean
+  isBuyer: boolean
+  isSeller: boolean
   isAdmin: boolean
 }
 
@@ -56,9 +60,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── login ──────────────────────────────────────────────────────────────────
   // Calls POST /api/auth/login, stores the JWT, sets user state.
-  const login = useCallback(async (username: string, password: string) => {
+  const login = useCallback(async (identifier: string, password: string) => {
     try {
-      const res = await authApi.login(username, password)
+      const res = await authApi.login(identifier, password)
       // Store the JWT token so the next app open restores the session
       tokenStorage.set(res.token)
       setUser(res.user)
@@ -84,13 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ── can ────────────────────────────────────────────────────────────────────
   // Role-based permission check for UI visibility.
   // Example: can('buyers') returns false for 'accounts' role.
-  const can = useCallback(
-    (module: string): boolean => {
-      if (!user) return false
-      return ROLE_PERMISSIONS[user.role]?.includes(module) ?? false
-    },
-    [user]
-  )
+  const can = useCallback((module: string) => hasPermission(user, module), [user])
 
   const value: AuthContextValue = {
     user,
@@ -98,7 +96,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     can,
-    isAdmin: user?.role === 'admin'
+    isInternal: user?.userType === 'internal',
+
+    isBuyer: user?.userType === 'buyer',
+
+    isSeller: user?.userType === 'seller',
+
+    isAdmin: user?.userType === 'internal' && (user as InternalUser).role === 'admin'
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

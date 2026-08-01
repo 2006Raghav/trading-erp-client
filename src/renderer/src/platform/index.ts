@@ -5,6 +5,15 @@ import { webFileHandler } from './web/fileHandler.js'
 import { electronTokenStorage } from './electron/tokenStorage.js'
 import { electronFileHandler } from './electron/fileHandler.js'
 
+declare global {
+  interface Window {
+    electron?: {
+      isElectron: boolean
+      appVersion?: string
+    }
+  }
+}
+
 // ── Platform detection ────────────────────────────────────────────────────────
 // window.electron is set by src/preload/index.ts via contextBridge.
 // In a plain browser it is undefined — that's the only check we ever need.

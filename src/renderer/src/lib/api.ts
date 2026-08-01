@@ -2,7 +2,7 @@ import { tokenStorage } from '../platform'
 
 const BASE =
   ((window as any).electron
-    ? (import.meta.env as any).VITE_API_URL_ELECTRON
+    ? (import.meta.env as any).VITE_PROD_URL_ELECTRON
     : import.meta.env.VITE_API_URL) || 'http://localhost:4000'
 
 async function request<T>(method: string, path: string, body?: unknown): Promise<T> {

@@ -15,11 +15,11 @@ export interface MeResponse {
 export const authApi = {
   /**
    * POST /api/auth/login
-   * Sends username + password, receives JWT token + user object.
+   * Sends identifier + password, receives JWT token + user object.
    * The token is stored by AuthContext after a successful call.
    */
-  login: (username: string, password: string) =>
-    api.request<LoginResponse>('POST', '/auth/login', { username, password }),
+  login: (identifier: string, password: string) =>
+    api.request<LoginResponse>('POST', '/auth/login', { identifier, password }),
 
   /**
    * POST /api/auth/logout
