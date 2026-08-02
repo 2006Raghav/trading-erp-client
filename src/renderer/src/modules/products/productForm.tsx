@@ -5,10 +5,16 @@ import { useToast } from '../auth/ToastContext'
 import { COMMODITY_UNITS, CURRENCIES } from '../../lib/constants'
 import type { Product, ProductCategory, Seller } from '../../lib/types'
 import { primaryBtnStyle, labelStyle, cancelBtnStyle, errorStyle } from '../cssUtils'
+import {
+  sellerProductsApi,
+  type SellerProductInput
+} from '../exchange/seller-products/seller-products.api'
+
 interface ProductFormProps {
   product?: Product
   categories: ProductCategory[]
-  sellers: Seller[]
+  sellers?: Seller[]
+  mode?: 'internal' | 'seller'
   onSuccess: (product: Product) => void
   onCancel: () => void
 }
@@ -16,7 +22,8 @@ interface ProductFormProps {
 export function ProductForm({
   product,
   categories,
-  sellers,
+  sellers = [],
+  mode = 'internal',
   onSuccess,
   onCancel
 }: ProductFormProps) {
@@ -25,8 +32,12 @@ export function ProductForm({
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const [form, setForm] = useState<ProductInput>({
-    sellerId: product?.sellerId ?? '',
+  const [form, setForm] = useState<ProductInput | SellerProductInput>({
+    ...(mode === 'internal'
+      ? {
+          sellerId: product?.sellerId ?? ''
+        }
+      : {}),
     categoryId: product?.categoryId ?? '',
     productName: product?.productName ?? '',
     purity: product?.purity ?? '',
@@ -51,7 +62,9 @@ export function ProductForm({
 
   function validateForm(): Record<string, string> {
     const e: Record<string, string> = {}
-    if (!form.sellerId) e.sellerId = 'Seller is required'
+    if (mode === 'internal' && !('sellerId' in form && form.sellerId)) {
+      e.sellerId = 'Seller is required'
+    }
     if (!form.categoryId) e.categoryId = 'Category is required'
     if (!form.productName?.trim()) e.productName = 'Product name is required'
     if (form.purity?.trim()) {
@@ -80,9 +93,14 @@ export function ProductForm({
 
     setSaving(true)
     try {
-      const res = isEdit
-        ? await productsApi.update(product!.id, form)
-        : await productsApi.create(form)
+      const res =
+        mode === 'seller'
+          ? isEdit
+            ? await sellerProductsApi.update(product!.id, form as SellerProductInput)
+            : await sellerProductsApi.create(form as SellerProductInput)
+          : isEdit
+            ? await productsApi.update(product!.id, form as ProductInput)
+            : await productsApi.create(form as ProductInput)
       if (res.success) onSuccess(res.data)
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'An error occurred')
@@ -125,25 +143,27 @@ export function ProductForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label style={labelStyle}>Seller *</label>
-          <select
-            value={form.sellerId}
-            onChange={(e) => setField('sellerId', e.target.value)}
-            onFocus={onFocus}
-            onBlur={(e) => onBlur(e, !!errors.sellerId)}
-            className="bg-white"
-            style={fieldStyle(!!errors.sellerId)}
-          >
-            <option value="">Select seller…</option>
-            {sellers.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.companyName} ({s.sellerCode})
-              </option>
-            ))}
-          </select>
-          {errors.sellerId && <p style={errorStyle}>{errors.sellerId}</p>}
-        </div>
+        {mode === 'internal' && (
+          <div>
+            <label style={labelStyle}>Seller *</label>
+            <select
+              value={form.sellerId}
+              onChange={(e) => setField('sellerId', e.target.value)}
+              onFocus={onFocus}
+              onBlur={(e) => onBlur(e, !!errors.sellerId)}
+              className="bg-white"
+              style={fieldStyle(!!errors.sellerId)}
+            >
+              <option value="">Select seller…</option>
+              {sellers.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.companyName} ({s.sellerCode})
+                </option>
+              ))}
+            </select>
+            {errors.sellerId && <p style={errorStyle}>{errors.sellerId}</p>}
+          </div>
+        )}
 
         <div>
           <label style={labelStyle}>Category *</label>

@@ -15,7 +15,8 @@ const SELLER_PERMISSIONS: readonly string[] = [
   'seller-products',
   'seller-orders',
   'seller-documents',
-  'marketplace'
+  'marketplace',
+  'myProducts'
 ]
 
 export function hasPermission(user: User | null, module: string): boolean {

@@ -19,9 +19,9 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 // This is UX-only enforcement — the server enforces permissions on every API call.
 // A motivated user could bypass this client-side check, but the server will 403 them.
 export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
-  admin: ['dashboard', 'buyers', 'sellers', 'products', 'users', 'marketplace', 'kyc'],
-  sales: ['dashboard', 'buyers', 'sellers', 'products', 'marketplace'],
-  accounts: ['dashboard', 'buyers', 'sellers', 'marketplace'],
+  admin: ['dashboard', 'buyers', 'sellers', 'products', 'users', 'marketPlace', 'kyc'],
+  sales: ['dashboard', 'buyers', 'sellers', 'products', 'marketPlace'],
+  accounts: ['dashboard', 'buyers', 'sellers', 'marketPlace'],
   documents: ['dashboard', 'buyers', 'sellers', 'marketplace', 'products']
 }
 
