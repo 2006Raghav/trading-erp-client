@@ -16,6 +16,7 @@ import { RegistrationPage } from './modules/registration/RegistrationPage'
 import { KycQueuePage } from './modules/kyc/kycQueuePage'
 import { MarketplacePage } from './modules/marketplace/MarketplacePage'
 import KycDetail from './modules/kyc/KycDetail'
+import { MyProducts } from './modules/exchange/seller-products/MyProductsPage'
 
 export default function App() {
   return (
@@ -95,6 +96,14 @@ export default function App() {
               element={
                 <ProtectedRoute require="users">
                   <UsersPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/myproducts/*"
+              element={
+                <ProtectedRoute require="myProducts">
+                  <MyProducts />
                 </ProtectedRoute>
               }
             />

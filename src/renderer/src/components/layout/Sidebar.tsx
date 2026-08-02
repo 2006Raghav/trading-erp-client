@@ -29,10 +29,16 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/sellers', label: 'Sellers', icon: Building2, module: 'sellers' },
   { to: '/products', label: 'Products', icon: Package, module: 'products' },
   {
+    to: '/myproducts',
+    label: 'My Products',
+    icon: Package,
+    module: 'myProducts'
+  },
+  {
     to: '/marketplace',
     label: 'Marketplace',
     icon: Store,
-    module: 'marketplace'
+    module: 'marketPlace'
   },
   { to: '/users', label: 'Users', icon: UserCog, module: 'users' },
   { to: '/kyc', label: 'KYC Queue', icon: ShieldCheck, module: 'kyc' },
