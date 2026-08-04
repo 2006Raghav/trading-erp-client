@@ -16,6 +16,7 @@ const SELLER_PERMISSIONS: readonly string[] = [
   'seller-orders',
   'seller-documents',
   'marketplace',
+
   'myProducts'
 ]
 
