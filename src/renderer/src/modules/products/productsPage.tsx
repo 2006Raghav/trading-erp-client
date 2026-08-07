@@ -29,7 +29,6 @@ export function ProductsPage() {
   const [editTarget, setEditTarget] = useState<Product | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null)
 
-  // Load filter dropdowns once on mount — they don't change often
   useEffect(() => {
     productsApi.getCategories().then((r) => {
       if (r.success) setCategories(r.data)
@@ -97,7 +96,7 @@ export function ProductsPage() {
     {
       key: 'pricePerUnit',
       label: 'Price / Unit',
-      numeric: true, // right-align + monospace via DataTable's numeric prop
+      numeric: true,
       render: (val: number, row: Product) =>
         val ? (
           <span className="font-mono" style={{ color: 'var(--color-ink-900)' }}>

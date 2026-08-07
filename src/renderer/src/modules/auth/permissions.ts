@@ -6,7 +6,8 @@ const BUYER_PERMISSIONS: readonly string[] = [
   'buyer-profile',
   'buyer-orders',
   'buyer-documents',
-  'marketplace'
+  'marketplace',
+  'commodityRequests'
 ]
 
 const SELLER_PERMISSIONS: readonly string[] = [

@@ -34,3 +34,5 @@ export const COMMODITY_UNITS = ['MT', 'KG', 'Oz', 'LB', 'Tonne'] as const
 
 // Currencies used in product pricing
 export const CURRENCIES = ['USD', 'EUR', 'GBP', 'AED', 'INR', 'CNY'] as const
+
+export const INCOTERMS = ['EXW', 'FOB', 'CIF', 'DAP', 'DDP'] as const
