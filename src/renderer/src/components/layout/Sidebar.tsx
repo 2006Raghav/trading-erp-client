@@ -12,6 +12,7 @@ import {
   LogOut,
   ShieldCheck,
   Store,
+  ClipboardList,
   type LucideIcon
 } from 'lucide-react'
 
@@ -38,7 +39,13 @@ const NAV_ITEMS: NavItem[] = [
     to: '/marketplace',
     label: 'Marketplace',
     icon: Store,
-    module: 'marketPlace'
+    module: 'marketplace'
+  },
+  {
+    to: '/commodity-requests',
+    label: 'Commodity Requests',
+    icon: ClipboardList,
+    module: 'commodityRequests'
   },
   { to: '/users', label: 'Users', icon: UserCog, module: 'users' },
   { to: '/kyc', label: 'KYC Queue', icon: ShieldCheck, module: 'kyc' },
