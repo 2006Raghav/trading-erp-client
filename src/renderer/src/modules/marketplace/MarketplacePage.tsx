@@ -25,12 +25,13 @@ import {
   marketplaceApi,
   type MarketplaceFilters,
   type MarketplaceProduct,
-  type MarketplaceCategory
+  type MarketplaceCategory,
+  type CommodityRequestPrefill
 } from './marketplace.api'
 
 import { MarketplaceCard } from './MarketplaceCard'
 import { MarketplaceFilters as MarketplaceFiltersBar } from './MarketplaceFilters'
-
+import { CommodityRequestSheet } from '../commodity-requests/CommodityRequestSheet'
 import type { PaginationMeta } from '../../lib/types'
 import { formatCurrency, formatQuantity } from '../../lib/utils'
 
@@ -56,6 +57,8 @@ export function MarketplacePage() {
   const [detailOpen, setDetailOpen] = useState(false)
 
   const [requestDialogOpen, setRequestDialogOpen] = useState(false)
+
+  const [requestPrefill, setRequestPrefill] = useState<CommodityRequestPrefill | null>(null)
 
   //-----------------------------------------------------------------------
   // Categories
@@ -149,7 +152,18 @@ export function MarketplacePage() {
 
   function handleRequestCommodity(product?: MarketplaceProduct) {
     if (product) {
+      setRequestPrefill({
+        categoryId: product.categoryId,
+        categoryName: product.categoryName,
+        productName: product.productName,
+        quantityUnit: product.quantityUnit,
+        purity: product.purity,
+        grade: product.grade,
+        currency: product.currency ?? 'USD'
+      })
       setSelectedProduct(product)
+    } else {
+      setRequestPrefill(null)
     }
 
     setRequestDialogOpen(true)
@@ -400,7 +414,10 @@ export function MarketplacePage() {
                 className="w-full bg-[var(--color-cobalt-600)] hover:bg-[var(--color-cobalt-700)]"
 
                 onClick={() => {
+                  if (!selectedProduct) return
+
                   setDetailOpen(false)
+
                   handleRequestCommodity(selectedProduct)
                 }}
               >
@@ -415,41 +432,16 @@ export function MarketplacePage() {
           Request Commodity Placeholder
       ======================================================== */}
 
-      <Sheet open={requestDialogOpen} onOpenChange={setRequestDialogOpen}>
-        <SheetContent className="sm:max-w-xl">
-          <SheetHeader>
-            <SheetTitle>Request Commodity</SheetTitle>
-
-            <SheetDescription>
-              This feature will allow buyers to submit commodity requests directly to the Exchange.
-              It will be connected to the Inquiry module in the next implementation.
-            </SheetDescription>
-          </SheetHeader>
-
-          <div className="mt-8 rounded-xl border border-dashed p-10 text-center">
-            <PackageSearch className="mx-auto h-12 w-12 text-muted-foreground" />
-
-            <h3 className="mt-5 text-lg font-semibold">Coming Soon</h3>
-
-            <p className="mt-2 text-sm text-muted-foreground">
-              Buyers will be able to specify commodity, quantity, target price, delivery country,
-              delivery terms, required purity and other procurement requirements from this screen.
-            </p>
-
-            {selectedProduct && (
-              <div className="mt-6 rounded-lg bg-muted p-4 text-left">
-                <p className="text-xs uppercase text-muted-foreground">Selected Commodity</p>
-
-                <p className="mt-1 font-medium">{selectedProduct.productName}</p>
-              </div>
-            )}
-
-            <Button variant="outline" className="mt-8 " onClick={() => setRequestDialogOpen(false)}>
-              Close
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <CommodityRequestSheet
+        open={requestDialogOpen}
+        onOpenChange={setRequestDialogOpen}
+        categories={categories}
+        product={requestPrefill ?? undefined}
+        onSuccess={() => {
+          setRequestDialogOpen(false)
+          toast.success('Commodity request submitted successfully.')
+        }}
+      />
     </div>
   )
 }

@@ -10,6 +10,15 @@ export interface MarketplaceFilters {
   page?: number
   pageSize?: number
 }
+export interface CommodityRequestPrefill {
+  categoryId: string
+  categoryName: string
+  productName: string
+  purity?: string
+  grade?: string
+  quantityUnit: string
+  currency?: string
+}
 
 export interface MarketplaceProduct {
   id: string
