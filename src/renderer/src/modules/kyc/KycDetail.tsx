@@ -34,7 +34,7 @@ import { RejectionModal } from './rejectionModal'
 
 export default function KycDetail() {
   const navigate = useNavigate()
-  const { entity, id } = useParams<{ entity: string; id: string }>()
+  const { entity, id } = useParams<{ entity: KycEntity; id: string }>()
   const toast = useToast()
 
   const [activeTab, setActiveTab] = useState('overview')
@@ -366,7 +366,14 @@ export default function KycDetail() {
             {company.kycStatus === 'pending' && (
               <Button
                 variant="secondary"
-                onClick={() => handleKycAction(company.entity as KycEntity, company.id, 'review')}
+                onClick={() => {
+                  if (!entity || !id) {
+                    toast.error('Invalid KYC application')
+                    return
+                  }
+
+                  handleKycAction(entity, id, 'review')
+                }}
                 disabled={isFetching || isActionLoading}
               >
                 <Clock3 className="mr-2 h-4 w-4" />
@@ -379,9 +386,14 @@ export default function KycDetail() {
               <>
                 <Button
                   className="bg-green-600 hover:bg-green-700 text-white"
-                  onClick={() =>
-                    handleKycAction(company.entity as KycEntity, company.id, 'approve')
-                  }
+                  onClick={() => {
+                    if (!entity || !id) {
+                      toast.error('Invalid KYC application')
+                      return
+                    }
+
+                    handleKycAction(entity, id, 'approve')
+                  }}
                   disabled={isFetching || isActionLoading}
                 >
                   <CheckCircle2 className="mr-2 h-4 w-4" />
@@ -406,13 +418,16 @@ export default function KycDetail() {
         onClose={() => setIsRejectModalOpen(false)}
         isSubmitting={isActionLoading}
         onConfirm={async (reason) => {
-          const success = await handleKycAction(
-            company.entity as KycEntity,
-            company.id,
-            'reject',
-            reason
-          )
-          if (success) setIsRejectModalOpen(false)
+          if (!entity || !id) {
+            toast.error('Invalid KYC application')
+            return
+          }
+
+          const success = await handleKycAction(entity, id, 'reject', reason)
+
+          if (success) {
+            setIsRejectModalOpen(false)
+          }
         }}
       />
     </div>

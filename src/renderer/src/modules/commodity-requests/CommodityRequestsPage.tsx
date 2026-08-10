@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Plus, RefreshCw, Search, ClipboardList, Filter } from 'lucide-react'
 
 import { commodityRequestsApi } from './commodityRequests.api'
-import { marketplaceApi, type MarketplaceCategory } from '../marketplace/marketplace.api'
+import { marketplaceApi } from '../marketplace/marketplace.api'
 
 import { CommodityRequestSheet } from './CommodityRequestSheet'
 import { CommodityRequestDetail } from './CommodityRequestDetail'
