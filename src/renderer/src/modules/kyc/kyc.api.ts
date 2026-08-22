@@ -3,89 +3,132 @@
 import { api } from '../../lib/api'
 import type { ApiSuccess } from '../../lib/types'
 
-export type KycEntity = 'buyer' | 'seller'
+import type {
+  KycAction,
+  KycDashboard,
+  KycDetails,
+  KycEntity,
+  KycFilters,
+  KycQueueItem
+} from './kyc.types'
 
-export type KycStatus = 'pending' | 'under_review' | 'approved' | 'rejected'
+export type {
+  KycAction,
+  KycDashboard,
+  KycDetails,
+  KycEntity,
+  KycFilters,
+  KycQueueItem,
+  KycStatus
+} from './kyc.types'
 
-export interface KycFilters {
-  entity?: KycEntity
-  status?: KycStatus
+// ─────────────────────────────────────────────────────────────
+// RESPONSE TYPES
+// ─────────────────────────────────────────────────────────────
+
+type KycResponse<T> = ApiSuccess<T>
+
+// ─────────────────────────────────────────────────────────────
+// QUERY BUILDER
+// ─────────────────────────────────────────────────────────────
+
+function buildQueueQuery(filters: KycFilters = {}) {
+  const params = new URLSearchParams()
+
+  if (filters.entity) {
+    params.set('entity', filters.entity)
+  }
+
+  if (filters.status) {
+    params.set('status', filters.status)
+  }
+
+  if (filters.country) {
+    params.set('country', filters.country)
+  }
+
+  const query = params.toString()
+
+  return query ? `?${query}` : ''
 }
 
-export interface KycQueueItem {
-  id: string
-  entity: KycEntity
-  code: string
-
-  companyName: string
-  contactPerson: string | null
-
-  email: string | null
-  phone: string | null
-
-  country: string | null
-
-  kycStatus: KycStatus
-
-  kycSubmittedAt: string | null
-  kycReviewedAt: string | null
-
-  rejectionReason: string | null
-
-  isActive: boolean
-}
-
-export interface KycDashboard {
-  pending: number
-  underReview: number
-}
-
-export interface KycDetails extends KycQueueItem {
-  createdAt: string
-  updatedAt: string
-
-  kycReviewedBy: string | null
-  documents?: { id: string; name: string; type: string; url?: string }[]
-}
+// ─────────────────────────────────────────────────────────────
+// API
+// ─────────────────────────────────────────────────────────────
 
 export const kycApi = {
   /**
-   * GET /api/kyc
+   * GET /kyc
+   *
+   * Returns the unified Buyer + Seller + Mandate KYC queue.
    */
   getQueue: (filters: KycFilters = {}) =>
-    api.request<ApiSuccess<KycQueueItem[]>>(
-      'GET',
-      `/kyc?${api.qs(filters as Record<string, string>)}`
-    ),
+    api.request<KycResponse<KycQueueItem[]>>('GET', `/kyc${buildQueueQuery(filters)}`),
 
   /**
-   * GET /api/kyc/dashboard
+   * GET /kyc/dashboard
+   *
+   * Returns pending and under-review counts.
    */
-  getDashboard: () => api.request<ApiSuccess<KycDashboard>>('GET', '/kyc/dashboard'),
+  getDashboard: () => api.request<KycResponse<KycDashboard>>('GET', '/kyc/dashboard'),
 
   /**
-   * GET /api/kyc/:entity/:id
+   * GET /kyc/:entity/:id
+   *
+   * Returns complete applicant details.
    */
   getById: (entity: KycEntity, id: string) =>
-    api.request<ApiSuccess<KycDetails>>('GET', `/kyc/${entity}/${id}`),
+    api.request<KycResponse<KycDetails>>('GET', `/kyc/${entity}/${id}`),
 
   /**
-   * PATCH /api/kyc/:entity/:id/review
+   * PATCH /kyc/:entity/:id/review
+   *
+   * pending → under_review
    */
   moveToReview: (entity: KycEntity, id: string) =>
-    // Passing a dummy key forces the frontend api wrapper to stringify the body
-    api.request<ApiSuccess<KycDetails>>('PATCH', `/kyc/${entity}/${id}/review`, { _force: true }),
+    api.request<KycResponse<KycDetails>>('PATCH', `/kyc/${entity}/${id}/review`, { _force: true }),
 
   /**
-   * PATCH /api/kyc/:entity/:id/approve
+   * PATCH /kyc/:entity/:id/approve
+   *
+   * under_review → approved
    */
   approve: (entity: KycEntity, id: string) =>
-    // Passing a dummy key forces the frontend api wrapper to stringify the body
-    api.request<ApiSuccess<KycDetails>>('PATCH', `/kyc/${entity}/${id}/approve`, { _force: true }),
+    api.request<KycResponse<KycDetails>>('PATCH', `/kyc/${entity}/${id}/approve`, { _force: true }),
 
   /**
-   * PATCH /api/kyc/:entity/:id/reject
+   * PATCH /kyc/:entity/:id/reject
+   *
+   * under_review → rejected
    */
   reject: (entity: KycEntity, id: string, reason: string) =>
-    api.request<ApiSuccess<KycDetails>>('PATCH', `/kyc/${entity}/${id}/reject`, { reason })
+    api.request<KycResponse<KycDetails>>('PATCH', `/kyc/${entity}/${id}/reject`, {
+      reason: reason.trim()
+    })
+}
+
+// ─────────────────────────────────────────────────────────────
+// ACTION DISPATCHER
+// ─────────────────────────────────────────────────────────────
+
+export async function executeKycAction(
+  action: KycAction,
+  entity: KycEntity,
+  id: string,
+  rejectionReason?: string
+) {
+  switch (action) {
+    case 'review':
+      return kycApi.moveToReview(entity, id)
+
+    case 'approve':
+      return kycApi.approve(entity, id)
+
+    case 'reject':
+      if (!rejectionReason?.trim()) {
+        throw new Error('Rejection reason is required.')
+      }
+
+      return kycApi.reject(entity, id, rejectionReason)
+  }
 }

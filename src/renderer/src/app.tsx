@@ -15,9 +15,10 @@ import { UsersPage } from './modules/users/usersPage'
 import { RegistrationPage } from './modules/registration/RegistrationPage'
 import { KycQueuePage } from './modules/kyc/kycQueuePage'
 import { MarketplacePage } from './modules/marketplace/MarketplacePage'
-import KycDetail from './modules/kyc/KycDetail'
+import KycReviewPage from './modules/kyc/KycReviewPage'
 import { MyProducts } from './modules/exchange/seller-products/MyProductsPage'
 import { CommodityRequestsPage } from './modules/commodity-requests/CommodityRequestsPage'
+import { MandatesPage } from './modules/mandates/MandatesPage'
 export default function App() {
   return (
     // AuthProvider holds the current user, login/logout functions, and role checks.
@@ -67,6 +68,14 @@ export default function App() {
               }
             />
             <Route
+              path="/mandates/*"
+              element={
+                <ProtectedRoute require="mandates">
+                  <MandatesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/products/*"
               element={
                 <ProtectedRoute require="products">
@@ -82,7 +91,14 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/kyc/:entity/:id" element={<KycDetail />} />
+            <Route
+              path="/kyc/:entity/:id"
+              element={
+                <ProtectedRoute require="kyc">
+                  <KycReviewPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/marketplace/*"
               element={
