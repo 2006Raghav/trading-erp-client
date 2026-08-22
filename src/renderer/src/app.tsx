@@ -19,6 +19,7 @@ import KycReviewPage from './modules/kyc/KycReviewPage'
 import { MyProducts } from './modules/exchange/seller-products/MyProductsPage'
 import { CommodityRequestsPage } from './modules/commodity-requests/CommodityRequestsPage'
 import { MandatesPage } from './modules/mandates/MandatesPage'
+import { ResubmissionPage } from './modules/registration/ResubmissionPage'
 export default function App() {
   return (
     // AuthProvider holds the current user, login/logout functions, and role checks.
@@ -128,6 +129,15 @@ export default function App() {
               element={
                 <ProtectedRoute require="myProducts">
                   <MyProducts />
+                </ProtectedRoute>
+              }
+            />
+            {/* KYC resubmission — accessible to any authenticated exchange user */}
+            <Route
+              path="/resubmit"
+              element={
+                <ProtectedRoute>
+                  <ResubmissionPage />
                 </ProtectedRoute>
               }
             />

@@ -33,7 +33,7 @@ import {
   ChevronLeft
 } from 'lucide-react'
 
-import { primaryBtnStyle, cancelBtnStyle } from '../cssUtils'
+import { primaryBtnStyle } from '../cssUtils'
 
 import { useToast } from '../auth/ToastContext'
 

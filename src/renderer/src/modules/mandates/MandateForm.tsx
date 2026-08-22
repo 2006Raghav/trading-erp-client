@@ -2,12 +2,7 @@
 
 import { useState, type ReactNode, type ChangeEvent, type FormEvent } from 'react'
 
-import {
-  mandatesApi,
-  type Mandate,
-  type MandateCreateBody,
-  type MandateRepresents
-} from './mandates.api'
+import { mandatesApi, type Mandate, type MandateCreateBody } from './mandates.api'
 
 import { useToast } from '../auth/ToastContext'
 

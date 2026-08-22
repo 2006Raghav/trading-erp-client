@@ -4,6 +4,8 @@
 
 export type InternalRole = 'admin' | 'sales' | 'accounts' | 'documents'
 
+export type KycStatus = 'pending' | 'under_review' | 'approved' | 'rejected' | 'resubmitted'
+
 export interface InternalUser {
   id: string
   userType: 'internal'
@@ -13,6 +15,8 @@ export interface InternalUser {
   email: string | null
 
   role: InternalRole
+
+  kycApproved: true
 
   isActive: boolean
   lastLoginAt: string | null
@@ -29,6 +33,10 @@ export interface BuyerUser {
   fullName: string
   email: string | null
 
+  kycApproved: boolean
+  kycStatus?: KycStatus
+  rejectionReason?: string | null
+
   isActive: boolean
 }
 
@@ -42,10 +50,32 @@ export interface SellerUser {
   fullName: string
   email: string | null
 
+  kycApproved: boolean
+  kycStatus?: KycStatus
+  rejectionReason?: string | null
+
   isActive: boolean
 }
 
-export type User = InternalUser | BuyerUser | SellerUser
+export interface MandateUser {
+  id: string
+  userType: 'mandate'
+
+  mandateId: string
+  represents: 'buyer_side' | 'seller_side'
+
+  companyName: string
+  fullName: string
+  email: string | null
+
+  kycApproved: boolean
+  kycStatus?: KycStatus
+  rejectionReason?: string | null
+
+  isActive: boolean
+}
+
+export type User = InternalUser | BuyerUser | SellerUser | MandateUser
 
 export interface Buyer {
   id: string
