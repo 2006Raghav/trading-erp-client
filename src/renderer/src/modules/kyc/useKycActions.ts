@@ -1,41 +1,55 @@
+// src/renderer/src/modules/kyc/kycAction.ts
+
 import { useState } from 'react'
 import { useToast } from '../auth/ToastContext'
-import { kycApi, type KycEntity } from './kyc.api'
+import { executeKycAction } from './kyc.api'
+import type { KycAction, KycEntity } from './kyc.types'
 
-export function useKycActions(onSuccessRefresh: () => void) {
+export function useKycActions(onSuccess?: () => void) {
   const toast = useToast()
-  const [isActionLoading, setIsActionLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleKycAction = async (
+  const execute = async (
     entity: KycEntity,
     id: string,
-    action: 'review' | 'approve' | 'reject',
-    rejectionReason?: string // Make reason an optional parameter
-  ) => {
+    action: KycAction,
+    reason?: string
+  ): Promise<boolean> => {
     try {
-      setIsActionLoading(true)
-      let res
+      setIsLoading(true)
 
-      if (action === 'review') {
-        res = await kycApi.moveToReview(entity, id)
-      } else if (action === 'approve') {
-        res = await kycApi.approve(entity, id)
-      } else if (action === 'reject' && rejectionReason) {
-        res = await kycApi.reject(entity, id, rejectionReason)
+      const response = await executeKycAction(action, entity, id, reason)
+
+      if (!response?.success) {
+        throw new Error('KYC action failed.')
       }
 
-      if (res?.success) {
-        toast.success(`Application successfully ${action}d`)
-        onSuccessRefresh()
-      }
-      return true // Return true on success so the UI knows it can close the modal
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : `Failed to ${action} application`)
+      toast.success(
+        action === 'review'
+          ? 'Application moved to review.'
+          : action === 'approve'
+            ? 'Application approved.'
+            : 'Application rejected.'
+      )
+
+      onSuccess?.()
+
+      return true
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update KYC application.')
+
       return false
     } finally {
-      setIsActionLoading(false)
+      setIsLoading(false)
     }
   }
 
-  return { handleKycAction, isActionLoading }
+  return {
+    execute,
+    isLoading,
+    handleKycAction: execute,
+    isActionLoading: isLoading
+  }
 }
+
+export const useKycAction = useKycActions

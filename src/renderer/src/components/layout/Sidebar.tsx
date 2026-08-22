@@ -13,6 +13,7 @@ import {
   ShieldCheck,
   Store,
   ClipboardList,
+  Handshake,
   type LucideIcon
 } from 'lucide-react'
 
@@ -28,7 +29,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, module: 'dashboard' },
   { to: '/buyers', label: 'Buyers', icon: Users2, module: 'buyers' },
   { to: '/sellers', label: 'Sellers', icon: Building2, module: 'sellers' },
-  { to: '/mandates', label: 'mandates', icon: Building2, module: 'mandates' },
+  { to: '/mandates', label: 'mandates', icon: Handshake, module: 'mandates' },
   { to: '/products', label: 'Products', icon: Package, module: 'products' },
   {
     to: '/myproducts',

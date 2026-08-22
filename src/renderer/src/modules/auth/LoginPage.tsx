@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from './AuthContext'
 
 export function LoginPage() {
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -138,19 +140,46 @@ export function LoginPage() {
               >
                 Password
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={inputStyle}
-                autoComplete="current-password"
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--color-cobalt-600)'
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--color-slate-200)'
-                }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={{
+                    ...inputStyle,
+                    paddingRight: '42px'
+                  }}
+                  autoComplete="current-password"
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'var(--color-cobalt-600)'
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'var(--color-slate-200)'
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    border: 'none',
+                    background: 'transparent',
+                    padding: '4px',
+                    cursor: 'pointer',
+                    color: 'var(--color-slate-500)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
             <button
               type="submit"
