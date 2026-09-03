@@ -19,7 +19,11 @@ import KycReviewPage from './modules/kyc/KycReviewPage'
 import { MyProducts } from './modules/exchange/seller-products/MyProductsPage'
 import { CommodityRequestsPage } from './modules/commodity-requests/CommodityRequestsPage'
 import { MandatesPage } from './modules/mandates/MandatesPage'
-import { ResubmissionPage } from './modules/registration/ResubmissionPage'
+import { KycStatusPage } from './modules/registration/KycStatusPage'
+import { CategoriesPage } from './modules/catalogue/CategoriesPage'
+import { TypesPage } from './modules/catalogue/TypesPage'
+import { OthersQueuePage } from './modules/catalogue/OthersQueuePage'
+import { InquiriesPage } from './modules/inquiries/InquiriesPage'
 export default function App() {
   return (
     // AuthProvider holds the current user, login/logout functions, and role checks.
@@ -40,8 +44,8 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            {/* Default: redirect root to dashboard */}
-            <Route index element={<Navigate to="/dashboard" replace />} />
+            {/* Default: redirect root to marketplace (which protected route will handle or redirect to dashboard if admin) */}
+            <Route index element={<Navigate to="/marketplace" replace />} />
             {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
             {/* Module routes: ProtectedRoute with `require` also checks role permission */}
             <Route
@@ -117,6 +121,14 @@ export default function App() {
               }
             />
             <Route
+              path="/inquiries/*"
+              element={
+                <ProtectedRoute require="inquiries">
+                  <InquiriesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/users/*"
               element={
                 <ProtectedRoute require="users">
@@ -132,18 +144,43 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            {/* KYC resubmission — accessible to any authenticated exchange user */}
+            {/* KYC status & resubmission — accessible to any authenticated exchange user */}
             <Route
-              path="/resubmit"
+              path="/kyc-status"
               element={
                 <ProtectedRoute>
-                  <ResubmissionPage />
+                  <KycStatusPage />
+                </ProtectedRoute>
+              }
+            />
+            {/* Admin Catalogue Routes */}
+            <Route
+              path="/catalogue/categories"
+              element={
+                <ProtectedRoute require="products">
+                  <CategoriesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/catalogue/types"
+              element={
+                <ProtectedRoute require="products">
+                  <TypesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/catalogue/others-queue"
+              element={
+                <ProtectedRoute require="products">
+                  <OthersQueuePage />
                 </ProtectedRoute>
               }
             />
           </Route>
-          {/* Catch-all: unknown URL → dashboard */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* Catch-all: unknown URL → marketplace */}
+          <Route path="*" element={<Navigate to="/marketplace" replace />} />
         </Routes>
       </ToastProvider>
     </AuthProvider>

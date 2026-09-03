@@ -14,6 +14,9 @@ import {
   Store,
   ClipboardList,
   Handshake,
+  ListTree,
+  ListOrdered,
+  FolderGit2,
   type LucideIcon
 } from 'lucide-react'
 
@@ -31,6 +34,9 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/sellers', label: 'Sellers', icon: Building2, module: 'sellers' },
   { to: '/mandates', label: 'mandates', icon: Handshake, module: 'mandates' },
   { to: '/products', label: 'Products', icon: Package, module: 'products' },
+  { to: '/catalogue/categories', label: 'Catalogue', icon: ListTree, module: 'products' },
+  // { to: '/catalogue/types', label: 'Cat. Types', icon: ListOrdered, module: 'products' },
+  // { to: '/catalogue/others-queue', label: 'Others Queue', icon: FolderGit2, module: 'products' },
   {
     to: '/myproducts',
     label: 'My Products',
@@ -51,9 +57,8 @@ const NAV_ITEMS: NavItem[] = [
   },
   { to: '/users', label: 'Users', icon: UserCog, module: 'users' },
   { to: '/kyc', label: 'KYC Queue', icon: ShieldCheck, module: 'kyc' },
-  { to: '/inquiries', label: 'Inquiries', icon: FileText, module: 'inquiries', disabled: true },
-  { to: '/shipments', label: 'Shipments', icon: Ship, module: 'shipments', disabled: true },
-  { to: '/payments', label: 'Payments', icon: DollarSign, module: 'payments', disabled: true }
+  { to: '/inquiries', label: 'Inquiries', icon: FileText, module: 'inquiries' },
+  // { to: '/payments', label: 'Payments', icon: DollarSign, module: 'payments', disabled: true }
 ]
 
 // Deterministic avatar color from entity name — §5.5
@@ -138,10 +143,9 @@ export function Sidebar() {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 transition-colors ${
-                  isActive
-                    ? 'text-white' /* active: white text */
-                    : 'text-slate-300 hover:text-white'
+                `flex items-center gap-3 px-3 transition-colors ${isActive
+                  ? 'text-white' /* active: white text */
+                  : 'text-slate-300 hover:text-white'
                 }`
               }
               style={({ isActive }) => ({
@@ -153,7 +157,7 @@ export function Sidebar() {
               })}
               onMouseEnter={(e) => {
                 if (!(e.currentTarget as HTMLElement).classList.contains('active')) {
-                  ;(e.currentTarget as HTMLElement).style.background = 'var(--color-navy-900)'
+                  ; (e.currentTarget as HTMLElement).style.background = 'var(--color-navy-900)'
                 }
               }}
               onMouseLeave={(e) => {
@@ -207,12 +211,12 @@ export function Sidebar() {
             color: 'var(--color-slate-300)'
           }}
           onMouseEnter={(e) => {
-            ;(e.currentTarget as HTMLElement).style.background = 'var(--color-navy-900)'
-            ;(e.currentTarget as HTMLElement).style.color = '#fff'
+            ; (e.currentTarget as HTMLElement).style.background = 'var(--color-navy-900)'
+              ; (e.currentTarget as HTMLElement).style.color = '#fff'
           }}
           onMouseLeave={(e) => {
-            ;(e.currentTarget as HTMLElement).style.background = ''
-            ;(e.currentTarget as HTMLElement).style.color = 'var(--color-slate-300)'
+            ; (e.currentTarget as HTMLElement).style.background = ''
+              ; (e.currentTarget as HTMLElement).style.color = 'var(--color-slate-300)'
           }}
         >
           <LogOut size={20} strokeWidth={1.5} />
