@@ -7,7 +7,8 @@ import {
   Building2,
   FileText,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Clock3
 } from 'lucide-react'
 
 import { useAuth } from '../auth/AuthContext'
@@ -62,12 +63,12 @@ const DOCUMENTS_BY_TYPE: Record<
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Resubmission Page
+// KYC Status & Resubmission Page
 // ─────────────────────────────────────────────────────────────────────────────
 
-type PageState = 'loading' | 'error' | 'ineligible' | 'documents' | 'success'
+type PageState = 'loading' | 'error' | 'under_review' | 'rejected' | 'approved' | 'success'
 
-export function ResubmissionPage() {
+export function KycStatusPage() {
   const navigate = useNavigate()
   const toast = useToast()
   const { user, kycStatus: contextKycStatus, rejectionReason: contextRejectionReason } = useAuth()
@@ -91,13 +92,13 @@ export function ResubmissionPage() {
 
   const entityId: string | null = user?.id ?? null
 
-  const companyName: string =
-    user && 'companyName' in user ? (user.companyName ?? '') : ''
+
 
   // ── Load status + documents on mount ──────────────────────────────────────
   const loadPage = useCallback(async () => {
     if (!entityType || !entityId) {
-      setPageState('ineligible')
+      setPageState('error')
+      setErrorMessage('User entity type or ID is missing')
       return
     }
 
@@ -116,22 +117,20 @@ export function ResubmissionPage() {
       setKycStatus(liveStatus)
       setRejectionReason(liveReason)
 
-      // Only rejected entities can resubmit
-      if (liveStatus !== 'rejected') {
-        setPageState('ineligible')
-        return
+      // Load current documents if rejected
+      if (liveStatus === 'rejected') {
+        const docsRes = await registrationApi.getDocuments(entityType, entityId)
+        if (docsRes.success && docsRes.data) {
+          setDocuments(docsRes.data)
+        }
       }
 
-      // Load current documents
-      const docsRes = await registrationApi.getDocuments(entityType, entityId)
+      if (liveStatus === 'approved') setPageState('approved')
+      else if (liveStatus === 'rejected') setPageState('rejected')
+      else setPageState('under_review')
 
-      if (docsRes.success && docsRes.data) {
-        setDocuments(docsRes.data)
-      }
-
-      setPageState('documents')
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Failed to load resubmission page')
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to load status')
       setPageState('error')
     }
   }, [entityType, entityId])
@@ -184,8 +183,13 @@ export function ResubmissionPage() {
   }
 
   // ── Remove handler ─────────────────────────────────────────────────────────
-  async function handleRemove(document: RegistrationDocument) {
+  async function handleRemove(document: RegistrationDocument | any) {
     if (!entityType || !entityId) return
+
+    if ('file' in document) {
+      setDocuments((current) => current.filter((d) => d.id !== document.id))
+      return
+    }
 
     try {
       const response = await registrationApi.removeDocument(
@@ -271,35 +275,57 @@ export function ResubmissionPage() {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Render: Ineligible (status is not "rejected")
+  // Render: Under Review
   // ─────────────────────────────────────────────────────────────────────────
 
-  if (pageState === 'ineligible') {
-    const statusLabel: Record<string, string> = {
-      pending: 'pending review',
-      under_review: 'under review',
-      resubmitted: 'already resubmitted and awaiting review',
-      approved: 'approved'
-    }
-
+  if (pageState === 'under_review') {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-canvas-50)] p-8 text-center">
-        <CheckCircle2 className="h-12 w-12 text-[var(--color-success)]" />
+        <Clock3 className="h-12 w-12 text-amber-500" />
         <h2 className="mt-4 text-lg font-semibold text-[var(--color-ink-900)]">
-          No action needed
+          Application Under Review
         </h2>
         <p className="mt-2 max-w-sm text-sm text-[var(--color-slate-500)]">
-          Your application is{' '}
-          {kycStatus ? statusLabel[kycStatus] ?? kycStatus : 'not in a rejected state'}.
-          Resubmission is only available for rejected applications.
+          Your application has been received and is currently being reviewed by our team.
+          You will be notified once it is approved or if any further action is required.
+        </p>
+      </div>
+    )
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Render: Approved
+  // ─────────────────────────────────────────────────────────────────────────
+
+  if (pageState === 'approved') {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-canvas-50)] p-8 text-center">
+        <div
+          className="flex h-20 w-20 items-center justify-center rounded-full"
+          style={{ background: 'var(--color-success-bg)' }}
+        >
+          <CheckCircle2
+            className="h-10 w-10"
+            style={{ color: 'var(--color-success)' }}
+          />
+        </div>
+
+        <h2
+          className="mt-6 text-2xl font-semibold"
+          style={{ color: 'var(--color-ink-900)' }}
+        >
+          Application Approved!
+        </h2>
+        <p className="mt-2 max-w-sm text-sm text-[var(--color-slate-500)]">
+          Your KYC verification is complete. You now have full access to the platform.
         </p>
         <Button
-          variant="outline"
+          onClick={() => navigate('/marketplace')}
           className="mt-6"
-          onClick={() => navigate('/dashboard')}
+          style={{ background: 'var(--color-cobalt-600)', color: 'white' }}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
+          Go to Marketplace
+          <ArrowLeft className="ml-2 h-4 w-4 rotate-180" />
         </Button>
       </div>
     )
@@ -351,7 +377,7 @@ export function ResubmissionPage() {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Render: Documents (main view)
+  // Render: Rejected Documents (main view)
   // ─────────────────────────────────────────────────────────────────────────
 
   const requiredDocuments = entityType ? DOCUMENTS_BY_TYPE[entityType] : []
@@ -451,6 +477,7 @@ export function ResubmissionPage() {
             onBack={() => navigate(-1)}
             onSubmit={handleSubmit}
             submitting={submitting}
+            kycStatus={kycStatus ?? undefined}
             submitLabel={
               submitting ? (
                 <>

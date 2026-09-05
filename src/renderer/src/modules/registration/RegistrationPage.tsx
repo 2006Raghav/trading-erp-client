@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 
 import { registrationApi } from './registration.api'
+import { useAuth } from '../auth/AuthContext'
 import { useToast } from '../auth/ToastContext'
 
 import { Button } from '../../components/ui/button'
@@ -50,7 +51,7 @@ import type {
   RegistrationDocument,
   RegistrationDocumentType,
   RegistrationEntityType,
-  RegistrationResponse
+  PendingDocument
 } from './registration.types'
 
 type RegistrationType = RegistrationEntityType
@@ -310,6 +311,7 @@ const TYPE_META = {
 export function RegistrationPage() {
   const navigate = useNavigate()
   const toast = useToast()
+  const { login } = useAuth()
 
   const [step, setStep] = useState<Step>(1)
 
@@ -317,18 +319,20 @@ export function RegistrationPage() {
 
   const [entityId, setEntityId] = useState<string | null>(null)
 
-  const [documents, setDocuments] = useState<RegistrationDocument[]>([])
+  const [documents, setDocuments] = useState<(RegistrationDocument | any)>([])
 
   const [uploading, setUploading] = useState<RegistrationDocumentType | null>(null)
 
   const [submitting, setSubmitting] = useState(false)
+
+  const [registrationData, setRegistrationData] = useState<RegistrationForm | null>(null)
 
   const [showPassword, setShowPassword] = useState(false)
 
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const form = useForm<RegistrationForm>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
 
     defaultValues: {
       registrationType: 'buyer',
@@ -399,88 +403,13 @@ export function RegistrationPage() {
       setStep(2)
       return
     }
-    try {
-      setSubmitting(true)
-
-      // Already-created registration.
-      // We are returning from Documents to Profile,
-      // so DO NOT create another registration.
-      if (entityId) {
-        setStep(2)
-        return
-      }
-
-      let response
-
-      const base = {
-        companyName: values.companyName,
-        country: values.country,
-        companyRegistrationNo: values.companyRegistrationNo,
-        tradeLicenseNo: values.tradeLicenseNo,
-        exportLicenseNo: values.exportLicenseNo,
-        contactPerson: values.contactPerson,
-        email: values.email,
-        phone: values.phone,
-        whatsapp: values.whatsapp,
-        password: values.password,
-        confirmPassword: values.confirmPassword
-      }
-
-      if (registrationType === 'buyer') {
-        response = await registrationApi.registerBuyer({
-          ...base,
-          businessType: values.businessType,
-          annualPurchaseCapacity: values.annualPurchaseCapacity
-        })
-      }
-
-      if (registrationType === 'seller') {
-        response = await registrationApi.registerSeller({
-          ...base,
-          factoryAddress: values.factoryAddress!,
-          warehouseAddress: values.warehouseAddress,
-          monthlyProductionCapacity: values.monthlyProductionCapacity!,
-          bankName: values.bankName!,
-          bankAccountNo: values.bankAccountNo!,
-          bankSwiftCode: values.bankSwiftCode!,
-          bankIban: values.bankIban,
-          bankCountry: values.bankCountry!
-        })
-      }
-
-      if (registrationType === 'mandate') {
-        response = await registrationApi.registerMandate({
-          ...base,
-          represents: values.represents!,
-          description: values.description
-        })
-      }
-
-      if (!response?.success) {
-        throw new Error('Registration could not be created')
-      }
-
-      // IMPORTANT:
-      // Preserve the entity created by Step 1.
-      setEntityId(response.data.id)
-
-      // New registration has no documents yet.
-      setDocuments([])
-
-      setStep(2)
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Registration could not be created')
-    } finally {
-      setSubmitting(false)
-    }
+    
+    // Save the registration data but defer the API call until submission
+    setRegistrationData(values)
+    setStep(2)
   }
 
   async function handleFileUpload(documentType: RegistrationDocumentType, file: File) {
-    if (!entityId) {
-      toast.error('Registration profile has not been created yet')
-      return
-    }
-
     const allowedTypes = [
       'application/pdf',
       'image/jpeg',
@@ -498,43 +427,34 @@ export function RegistrationPage() {
       return
     }
 
-    try {
-      setUploading(documentType)
+    const newPendingDoc: PendingDocument = {
+      id: crypto.randomUUID(),
+      documentType,
+      file
+    }
 
-      const response = await registrationApi.uploadDocument(
-        entityId,
-        registrationType,
-        documentType,
-        file
-      )
+    setDocuments((current) => {
+      const isMultiFile =
+        documentType === 'analytical_reports' || documentType === 'past_trade_records'
 
-      if (!response.success) {
-        throw new Error(response.error || 'Document upload failed')
+      if (isMultiFile) {
+        return [...current, newPendingDoc]
       }
 
-      const uploadedDocument = response.data
-
-      setDocuments((current) => {
-        const isMultiFile =
-          documentType === 'analytical_reports' || documentType === 'past_trade_records'
-
-        if (isMultiFile) {
-          return [...current, uploadedDocument]
-        }
-
-        return [
-          ...current.filter((document) => document.documentType !== documentType),
-          uploadedDocument
-        ]
-      })
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Document upload failed')
-    } finally {
-      setUploading(null)
-    }
+      return [
+        ...current.filter((document) => document.documentType !== documentType),
+        newPendingDoc
+      ]
+    })
   }
 
-  async function handleRemoveDocument(document: RegistrationDocument) {
+  async function handleRemoveDocument(document: RegistrationDocument | any) {
+    if ('file' in document) {
+      // Local pending document
+      setDocuments((current) => current.filter((item) => item.id !== document.id))
+      return
+    }
+    
     if (!entityId) return
 
     try {
@@ -556,8 +476,8 @@ export function RegistrationPage() {
   }
 
   async function handleSubmitApplication() {
-    if (!entityId) {
-      toast.error('Registration entity was not found')
+    if (!registrationData && !entityId) {
+      toast.error('Registration data is missing')
       return
     }
 
@@ -569,20 +489,112 @@ export function RegistrationPage() {
     try {
       setSubmitting(true)
 
-      const response = await registrationApi.submitApplication({
-        entityId,
+      let currentEntityId = entityId
+
+      // 1. Create the entity if it hasn't been created yet
+      if (!currentEntityId && registrationData) {
+        let response
+        
+        const base = {
+          companyName: registrationData.companyName,
+          country: registrationData.country,
+          companyRegistrationNo: registrationData.companyRegistrationNo,
+          tradeLicenseNo: registrationData.tradeLicenseNo,
+          exportLicenseNo: registrationData.exportLicenseNo,
+          contactPerson: registrationData.contactPerson,
+          email: registrationData.email,
+          phone: registrationData.phone,
+          whatsapp: registrationData.whatsapp,
+          password: registrationData.password,
+          confirmPassword: registrationData.confirmPassword
+        }
+
+        if (registrationType === 'buyer') {
+          response = await registrationApi.registerBuyer({
+            ...base,
+            businessType: registrationData.businessType,
+            annualPurchaseCapacity: registrationData.annualPurchaseCapacity
+          })
+        }
+
+        if (registrationType === 'seller') {
+          response = await registrationApi.registerSeller({
+            ...base,
+            factoryAddress: registrationData.factoryAddress!,
+            warehouseAddress: registrationData.warehouseAddress,
+            monthlyProductionCapacity: registrationData.monthlyProductionCapacity!,
+            bankName: registrationData.bankName!,
+            bankAccountNo: registrationData.bankAccountNo!,
+            bankSwiftCode: registrationData.bankSwiftCode!,
+            bankIban: registrationData.bankIban,
+            bankCountry: registrationData.bankCountry!
+          })
+        }
+
+        if (registrationType === 'mandate') {
+          response = await registrationApi.registerMandate({
+            ...base,
+            represents: registrationData.represents!,
+            description: registrationData.description
+          })
+        }
+
+        if (!response?.success || !response.data?.id) {
+          throw new Error('Registration could not be created')
+        }
+        
+        currentEntityId = response.data.id
+        setEntityId(currentEntityId)
+      }
+
+      if (!currentEntityId) {
+        throw new Error('Entity ID missing after registration')
+      }
+
+      // 2. Upload all pending documents sequentially
+      const pendingDocs = documents.filter((doc): doc is any => 'file' in doc)
+      
+      for (const pendingDoc of pendingDocs) {
+        setUploading(pendingDoc.documentType)
+        const response = await registrationApi.uploadDocument(
+          currentEntityId,
+          registrationType,
+          pendingDoc.documentType,
+          pendingDoc.file
+        )
+        
+        if (!response.success) {
+          throw new Error(`Failed to upload ${pendingDoc.file.name}: ${response.error || 'Unknown error'}`)
+        }
+      }
+      setUploading(null)
+
+      // 3. Submit application
+      const submitResponse = await registrationApi.submitApplication({
+        entityId: currentEntityId,
         entityType: registrationType
       })
 
-      if (!response.success) {
+      if (!submitResponse.success) {
         throw new Error('Application could not be submitted')
       }
 
+      // Auto-login after successful registration
+      if (registrationData?.email && registrationData?.password) {
+        const loginRes = await login(registrationData.email, registrationData.password)
+        if (loginRes.success) {
+          navigate('/kyc-status')
+          return
+        }
+      }
+
+      // Fallback if login fails for some reason
       setStep(3)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Application could not be submitted')
     } finally {
       setSubmitting(false)
+      setUploading(null)
     }
   }
 
@@ -727,7 +739,7 @@ export function RegistrationPage() {
 
                 {step === 1 && (
                   <Form {...form}>
-                    <form onSubmit={form.handleSubmit(continueToDocuments)} className="space-y-8">
+                    <form onSubmit={form.handleSubmit(continueToDocuments as any)} className="space-y-8">
                       {/* COMPANY */}
 
                       <FormSection
@@ -736,35 +748,35 @@ export function RegistrationPage() {
                       >
                         <div className="grid gap-5 md:grid-cols-2">
                           <Field
-                            control={form.control}
+                            control={form.control as any}
                             name="companyName"
                             label="Company Name"
                             placeholder="Acme Trading Ltd"
                           />
 
                           <Field
-                            control={form.control}
+                            control={form.control as any}
                             name="country"
                             label="Country"
                             placeholder="India"
                           />
 
                           <Field
-                            control={form.control}
+                            control={form.control as any}
                             name="companyRegistrationNo"
                             label="Company Registration Number"
                             placeholder="REG-001234"
                           />
 
                           <Field
-                            control={form.control}
+                            control={form.control as any}
                             name="tradeLicenseNo"
                             label="Trade License Number"
                             placeholder="TL-001234"
                           />
 
                           <Field
-                            control={form.control}
+                            control={form.control as any}
                             name="exportLicenseNo"
                             label="Export License Number"
                             placeholder="EL-001234"
@@ -780,14 +792,14 @@ export function RegistrationPage() {
                       >
                         <div className="grid gap-5 md:grid-cols-2">
                           <Field
-                            control={form.control}
+                            control={form.control as any}
                             name="contactPerson"
                             label="Contact Person Full Name"
                             placeholder="John Anderson"
                           />
 
                           <Field
-                            control={form.control}
+                            control={form.control as any}
                             name="email"
                             label="Business Email"
                             type="email"
@@ -795,14 +807,14 @@ export function RegistrationPage() {
                           />
 
                           <Field
-                            control={form.control}
+                            control={form.control as any}
                             name="phone"
                             label="Phone Number"
                             placeholder="+91 9876543210"
                           />
 
                           <Field
-                            control={form.control}
+                            control={form.control as any}
                             name="whatsapp"
                             label="WhatsApp Number"
                             placeholder="+91 9876543210"
@@ -819,7 +831,7 @@ export function RegistrationPage() {
                         >
                           <div className="grid gap-5 md:grid-cols-2">
                             <FormField
-                              control={form.control}
+                              control={form.control as any}
                               name="businessType"
                               render={({ field }) => (
                                 <FormItem>
@@ -849,7 +861,7 @@ export function RegistrationPage() {
                             />
 
                             <Field
-                              control={form.control}
+                              control={form.control as any}
                               name="annualPurchaseCapacity"
                               label="Annual Purchase Capacity"
                               type="number"
@@ -869,21 +881,21 @@ export function RegistrationPage() {
                           >
                             <div className="grid gap-5 md:grid-cols-2">
                               <Field
-                                control={form.control}
+                                control={form.control as any}
                                 name="factoryAddress"
                                 label="Factory Address"
                                 placeholder="Factory address"
                               />
 
                               <Field
-                                control={form.control}
+                                control={form.control as any}
                                 name="warehouseAddress"
                                 label="Warehouse Address"
                                 placeholder="Warehouse address"
                               />
 
                               <Field
-                                control={form.control}
+                                control={form.control as any}
                                 name="monthlyProductionCapacity"
                                 label="Monthly Production Capacity (MT)"
                                 type="number"
@@ -898,35 +910,35 @@ export function RegistrationPage() {
                           >
                             <div className="grid gap-5 md:grid-cols-2">
                               <Field
-                                control={form.control}
+                                control={form.control as any}
                                 name="bankName"
                                 label="Bank Name"
                                 placeholder="Bank name"
                               />
 
                               <Field
-                                control={form.control}
+                                control={form.control as any}
                                 name="bankAccountNo"
                                 label="Bank Account Number"
                                 placeholder="Account number"
                               />
 
                               <Field
-                                control={form.control}
+                                control={form.control as any}
                                 name="bankSwiftCode"
                                 label="SWIFT / BIC Code"
                                 placeholder="SWIFTBIC"
                               />
 
                               <Field
-                                control={form.control}
+                                control={form.control as any}
                                 name="bankIban"
                                 label="IBAN"
                                 placeholder="IBAN"
                               />
 
                               <Field
-                                control={form.control}
+                                control={form.control as any}
                                 name="bankCountry"
                                 label="Bank Country"
                                 placeholder="India"
@@ -945,7 +957,7 @@ export function RegistrationPage() {
                         >
                           <div className="space-y-5">
                             <FormField
-                              control={form.control}
+                              control={form.control as any}
                               name="represents"
                               render={({ field }) => (
                                 <FormItem>
@@ -973,7 +985,7 @@ export function RegistrationPage() {
                             />
 
                             <FormField
-                              control={form.control}
+                              control={form.control as any}
                               name="description"
                               render={({ field }) => (
                                 <FormItem>
@@ -1006,7 +1018,7 @@ export function RegistrationPage() {
                       >
                         <div className="grid gap-5 md:grid-cols-2">
                           <PasswordField
-                            control={form.control}
+                            control={form.control as any}
                             name="password"
                             label="Password"
                             show={showPassword}
@@ -1014,7 +1026,7 @@ export function RegistrationPage() {
                           />
 
                           <PasswordField
-                            control={form.control}
+                            control={form.control as any}
                             name="confirmPassword"
                             label="Confirm Password"
                             show={showConfirmPassword}
@@ -1053,7 +1065,7 @@ export function RegistrationPage() {
                 {step === 2 && (
                   <RegistrationDocuments
                     registrationType={registrationType}
-                    documents={documents}
+                    documents={documents as any}
                     requiredDocuments={requiredDocuments}
                     uploading={uploading}
                     allRequiredUploaded={allRequiredUploaded}

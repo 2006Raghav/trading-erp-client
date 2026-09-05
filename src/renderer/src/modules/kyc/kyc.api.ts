@@ -104,6 +104,16 @@ export const kycApi = {
   reject: (entity: KycEntity, id: string, reason: string) =>
     api.request<KycResponse<KycDetails>>('PATCH', `/kyc/${entity}/${id}/reject`, {
       reason: reason.trim()
+    }),
+
+  /**
+   * PATCH /kyc/:entity/:id/documents/:documentId/verify
+   *
+   * Toggle document verification state
+   */
+  verifyDocument: (entity: KycEntity, id: string, documentId: string, verified: boolean) =>
+    api.request<KycResponse<KycDetails>>('PATCH', `/kyc/${entity}/${id}/documents/${documentId}/verify`, {
+      verified
     })
 }
 

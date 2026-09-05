@@ -1,15 +1,16 @@
+import { useState } from 'react'
 import { CheckCircle2, FileText, Loader2, Trash2, Upload } from 'lucide-react'
-
-import type { RegistrationDocument, RegistrationDocumentType } from './registration.types'
+import type { RegistrationDocument, RegistrationDocumentType, PendingDocument } from './registration.types'
 
 interface DocumentUploadRowProps {
   documentType: RegistrationDocumentType
   label: string
-  documents: RegistrationDocument[]
+  documents: (RegistrationDocument | PendingDocument)[]
   multiple: boolean
   uploading: boolean
-  onUpload: (documentType: RegistrationDocumentType, file: File) => Promise<void>
-  onRemove: (document: RegistrationDocument) => Promise<void>
+  onUpload: (documentType: RegistrationDocumentType, file: File) => Promise<void> | void
+  onRemove: (document: RegistrationDocument | PendingDocument) => Promise<void> | void
+  kycStatus?: string
 }
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024
@@ -36,8 +37,11 @@ export function DocumentUploadRow({
   multiple,
   uploading,
   onUpload,
-  onRemove
+  onRemove,
+  kycStatus
 }: DocumentUploadRowProps) {
+  const [isDragging, setIsDragging] = useState(false)
+
   const inputId = `registration-document-${documentType}`
 
   const hasDocuments = documents.length > 0
@@ -53,6 +57,28 @@ export function DocumentUploadRow({
     void processFiles(files)
 
     event.target.value = ''
+  }
+
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  function handleDragLeave(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault()
+    setIsDragging(false)
+
+    if (uploading) return
+
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length === 0) return
+
+    void processFiles(files)
   }
 
   async function processFiles(files: File[]) {
@@ -73,8 +99,28 @@ export function DocumentUploadRow({
     }
   }
 
+  const isFlagged =
+    kycStatus === 'rejected' &&
+    (!hasDocuments ||
+      documents.some((doc) => {
+        if ('file' in doc) return false // Pending document (just uploaded by user)
+        return doc.verified !== true
+      }))
+
   return (
-    <div className="rounded-lg border border-[var(--color-slate-200)] bg-white p-4">
+    <div 
+      className={[
+        'rounded-lg border p-4 transition-colors',
+        isDragging
+          ? 'border-[var(--color-slate-400)] bg-[var(--color-canvas-50)]'
+          : isFlagged
+            ? 'border-[var(--color-danger)] bg-[var(--color-danger-bg)]'
+            : 'border-[var(--color-slate-200)] bg-white'
+      ].join(' ')}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         {/* DOCUMENT INFORMATION */}
 
@@ -97,12 +143,14 @@ export function DocumentUploadRow({
               <span
                 className={[
                   'rounded-full px-2 py-0.5 text-[10px] font-semibold',
-                  hasDocuments
-                    ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]'
-                    : 'bg-[var(--color-danger-bg)] text-[var(--color-danger)]'
+                  isFlagged
+                    ? 'bg-[var(--color-danger)] text-white'
+                    : hasDocuments
+                      ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]'
+                      : 'bg-[var(--color-slate-100)] text-[var(--color-slate-600)]'
                 ].join(' ')}
               >
-                {hasDocuments ? 'Uploaded' : 'Required'}
+                {isFlagged ? 'Action Required' : hasDocuments ? 'Uploaded' : 'Required'}
               </span>
             </div>
 
@@ -119,6 +167,8 @@ export function DocumentUploadRow({
                     return null
                   }
 
+                  const name = 'file' in document ? document.file.name : document.fileName
+
                   return (
                     <div
                       key={document.id}
@@ -127,14 +177,14 @@ export function DocumentUploadRow({
                       <FileText className="h-3.5 w-3.5 shrink-0 text-[var(--color-slate-500)]" />
 
                       <span className="min-w-0 flex-1 truncate text-xs text-[var(--color-ink-900)]">
-                        {document.fileName || 'Uploaded document'}
+                        {name || 'Uploaded document'}
                       </span>
 
                       <button
                         type="button"
                         disabled={uploading}
                         onClick={() => void onRemove(document)}
-                        aria-label={`Remove ${document.fileName || 'document'}`}
+                        aria-label={`Remove ${name || 'document'}`}
                         className="shrink-0 text-[var(--color-slate-500)] hover:text-[var(--color-danger)] disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <Trash2 className="h-3.5 w-3.5" />

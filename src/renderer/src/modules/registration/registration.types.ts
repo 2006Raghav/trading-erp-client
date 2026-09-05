@@ -120,6 +120,13 @@ export interface RegistrationDocument {
   fileUrl?: string | null
   storageKey?: string
   uploadedAt?: string
+  verified?: boolean
+}
+
+export interface PendingDocument {
+  id: string
+  documentType: RegistrationDocumentType
+  file: File
 }
 
 export interface RegistrationDocumentsResponse {

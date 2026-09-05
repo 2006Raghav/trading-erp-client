@@ -8,7 +8,8 @@ import { DocumentUploadRow } from './DocumentUploadRow'
 import type {
   RegistrationDocument,
   RegistrationDocumentType,
-  RegistrationType
+  RegistrationType,
+  PendingDocument
 } from './registration.types'
 
 export interface RequiredDocument {
@@ -18,17 +19,18 @@ export interface RequiredDocument {
 
 interface RegistrationDocumentsProps {
   registrationType: RegistrationType
-  documents: RegistrationDocument[]
+  documents: (RegistrationDocument | PendingDocument)[]
   requiredDocuments: readonly RequiredDocument[]
   uploading: RegistrationDocumentType | null
   allRequiredUploaded: boolean
   onUpload: (type: RegistrationDocumentType, file: File) => void
-  onRemove: (document: RegistrationDocument) => void
+  onRemove: (document: RegistrationDocument | PendingDocument) => void
   onBack: () => void
   onSubmit: () => void
   submitting: boolean
   /** Optional override for the submit button label. Defaults to 'Submit Application'. */
   submitLabel?: React.ReactNode
+  kycStatus?: string
 }
 
 const MULTI_FILE_DOCUMENT_TYPES: readonly RegistrationDocumentType[] = [
@@ -50,13 +52,16 @@ export function RegistrationDocuments({
   onRemove,
   onBack,
   onSubmit,
-  submitLabel
+  submitLabel,
+  kycStatus
 }: RegistrationDocumentsProps) {
   const uploadedTypes = new Set(documents.map((document) => document.documentType))
 
   const allRequiredUploaded = requiredDocuments.every((document) =>
     uploadedTypes.has(document.type)
   )
+
+
 
   return (
     <div className="space-y-7">
@@ -94,6 +99,7 @@ export function RegistrationDocuments({
               uploading={uploading === document.type}
               onUpload={onUpload}
               onRemove={onRemove}
+              kycStatus={kycStatus}
             />
           )
         })}
