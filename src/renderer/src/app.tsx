@@ -21,8 +21,6 @@ import { CommodityRequestsPage } from './modules/commodity-requests/CommodityReq
 import { MandatesPage } from './modules/mandates/MandatesPage'
 import { KycStatusPage } from './modules/registration/KycStatusPage'
 import { CategoriesPage } from './modules/catalogue/CategoriesPage'
-import { TypesPage } from './modules/catalogue/TypesPage'
-import { OthersQueuePage } from './modules/catalogue/OthersQueuePage'
 import { InquiriesPage } from './modules/inquiries/InquiriesPage'
 export default function App() {
   return (
@@ -159,22 +157,6 @@ export default function App() {
               element={
                 <ProtectedRoute require="products">
                   <CategoriesPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/catalogue/types"
-              element={
-                <ProtectedRoute require="products">
-                  <TypesPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/catalogue/others-queue"
-              element={
-                <ProtectedRoute require="products">
-                  <OthersQueuePage />
                 </ProtectedRoute>
               }
             />
