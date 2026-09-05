@@ -6,12 +6,13 @@ import {
   Building2,
   Package,
   FileText,
-  Ship,
-  DollarSign,
   UserCog,
   LogOut,
   ShieldCheck,
   Store,
+  ClipboardList,
+  Handshake,
+  ListTree,
   type LucideIcon
 } from 'lucide-react'
 
@@ -27,7 +28,9 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, module: 'dashboard' },
   { to: '/buyers', label: 'Buyers', icon: Users2, module: 'buyers' },
   { to: '/sellers', label: 'Sellers', icon: Building2, module: 'sellers' },
+  { to: '/mandates', label: 'mandates', icon: Handshake, module: 'mandates' },
   { to: '/products', label: 'Products', icon: Package, module: 'products' },
+  { to: '/catalogue/categories', label: 'Catalogue', icon: ListTree, module: 'products' },
   {
     to: '/myproducts',
     label: 'My Products',
@@ -38,13 +41,18 @@ const NAV_ITEMS: NavItem[] = [
     to: '/marketplace',
     label: 'Marketplace',
     icon: Store,
-    module: 'marketPlace'
+    module: 'marketplace'
+  },
+  {
+    to: '/commodity-requests',
+    label: 'Commodity Requests',
+    icon: ClipboardList,
+    module: 'commodityRequests'
   },
   { to: '/users', label: 'Users', icon: UserCog, module: 'users' },
   { to: '/kyc', label: 'KYC Queue', icon: ShieldCheck, module: 'kyc' },
-  { to: '/inquiries', label: 'Inquiries', icon: FileText, module: 'inquiries', disabled: true },
-  { to: '/shipments', label: 'Shipments', icon: Ship, module: 'shipments', disabled: true },
-  { to: '/payments', label: 'Payments', icon: DollarSign, module: 'payments', disabled: true }
+  { to: '/inquiries', label: 'Inquiries', icon: FileText, module: 'inquiries' }
+  // { to: '/payments', label: 'Payments', icon: module: 'payments', disabled: true }
 ]
 
 // Deterministic avatar color from entity name — §5.5

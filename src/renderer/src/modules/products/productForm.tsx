@@ -10,6 +10,10 @@ import {
   type SellerProductInput
 } from '../exchange/seller-products/seller-products.api'
 
+type ProductFormInput = SellerProductInput & {
+  sellerId?: string
+}
+
 interface ProductFormProps {
   product?: Product
   categories: ProductCategory[]
@@ -32,7 +36,7 @@ export function ProductForm({
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const [form, setForm] = useState<ProductInput | SellerProductInput>({
+  const [form, setForm] = useState<ProductFormInput>({
     ...(mode === 'internal'
       ? {
           sellerId: product?.sellerId ?? ''
@@ -50,7 +54,7 @@ export function ProductForm({
     warehouseLocation: product?.warehouseLocation ?? ''
   })
 
-  function setField<K extends keyof ProductInput>(key: K, value: ProductInput[K]) {
+  function setField<K extends keyof ProductFormInput>(key: K, value: ProductFormInput[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (errors[key])
       setErrors((prev) => {
