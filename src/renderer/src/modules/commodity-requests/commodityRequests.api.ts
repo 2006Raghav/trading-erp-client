@@ -35,7 +35,10 @@ export interface CommodityRequestDetailModel {
 }
 
 export interface CommodityRequestInput {
-  categoryId: string
+  categoryId?: string
+  isCustomCategory?: boolean
+  customFamilyName?: string
+  customTypeName?: string
 
   quantity: number
   quantityUnit: string
