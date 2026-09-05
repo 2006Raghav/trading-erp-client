@@ -145,11 +145,13 @@ export default function KycReviewPage() {
 
       setApplication(response.data)
 
-      /**
-       * Reset verification state whenever the application is refreshed.
-       * Verification must be consciously performed during the current review.
-       */
-      setVerifiedDocuments({})
+      const nextVerifiedState: DocumentVerificationState = {}
+      response.data.documents.forEach((doc) => {
+        if (doc.verificationStatus === 'verified') {
+          nextVerifiedState[doc.id] = true
+        }
+      })
+      setVerifiedDocuments(nextVerifiedState)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to load KYC application')
     } finally {
@@ -191,31 +193,30 @@ export default function KycReviewPage() {
   }, [requiredDocuments, applicantDocumentTypes])
 
   const verificationGroups = useMemo(() => {
-    const regularDocuments = documents.filter(
-      (document) => getDocumentType(document) !== 'analytical_report'
-    )
-
-    const analyticalReports = documents.filter((document) => {
-      const type = getDocumentType(document)
-
-      return type === 'analytical_reports' || type === 'analytical_report'
+    const byType: Record<string, KycDocument[]> = {}
+    documents.forEach((doc) => {
+      let type = getDocumentType(doc)
+      if (type === 'analytical_report') type = 'analytical_reports'
+      if (!byType[type]) byType[type] = []
+      byType[type].push(doc)
     })
 
+    const singleDocuments: KycDocument[] = []
+    const documentGroups: { type: string; documents: KycDocument[] }[] = []
+
+    for (const [type, docs] of Object.entries(byType)) {
+      if (docs.length === 1) {
+        singleDocuments.push(docs[0])
+      } else if (docs.length > 1) {
+        documentGroups.push({ type, documents: docs })
+      }
+    }
+
     return {
-      regularDocuments,
-      analyticalReports
+      singleDocuments,
+      documentGroups
     }
   }, [documents])
-
-  const analyticalReportsVerified = useMemo(() => {
-    if (application?.entity !== 'seller' || verificationGroups.analyticalReports.length === 0) {
-      return false
-    }
-
-    return verificationGroups.analyticalReports.every(
-      (document) => verifiedDocuments[document.id] === true
-    )
-  }, [application?.entity, verificationGroups.analyticalReports, verifiedDocuments])
 
   const verifiedDocumentCount = useMemo(() => {
     return Object.values(verifiedDocuments).filter(Boolean).length
@@ -247,25 +248,62 @@ export default function KycReviewPage() {
       .toUpperCase()
   }, [application?.companyName])
 
-  const toggleDocumentVerification = (documentId: string) => {
+  const toggleDocumentVerification = async (documentId: string) => {
+    const isCurrentlyVerified = !!verifiedDocuments[documentId]
+    const nextState = !isCurrentlyVerified
+
     setVerifiedDocuments((current) => ({
       ...current,
-      [documentId]: !current[documentId]
+      [documentId]: nextState
     }))
+
+    if (entity && id) {
+      try {
+        await kycApi.verifyDocument(entity, id, documentId, nextState)
+      } catch {
+        toast.error('Failed to save document verification')
+        setVerifiedDocuments((current) => ({
+          ...current,
+          [documentId]: isCurrentlyVerified
+        }))
+      }
+    }
   }
 
-  const verifyAllDocuments = () => {
-    const nextState: DocumentVerificationState = {}
+  const verifyAllDocuments = async () => {
+    if (!entity || !id) return
 
-    documents.forEach((document) => {
-      nextState[document.id] = true
+    const unverifiedDocs = documents.filter(doc => !verifiedDocuments[doc.id])
+    if (unverifiedDocs.length === 0) return
+
+    const nextState: DocumentVerificationState = { ...verifiedDocuments }
+    unverifiedDocs.forEach((doc) => {
+      nextState[doc.id] = true
     })
-
     setVerifiedDocuments(nextState)
+
+    try {
+      await Promise.all(unverifiedDocs.map(doc => kycApi.verifyDocument(entity, id, doc.id, true)))
+    } catch {
+      toast.error('Failed to save some document verifications')
+      fetchApplication()
+    }
   }
 
-  const clearVerification = () => {
+  const clearVerification = async () => {
+    if (!entity || !id) return
+
+    const verifiedDocs = documents.filter(doc => verifiedDocuments[doc.id])
+    if (verifiedDocs.length === 0) return
+
     setVerifiedDocuments({})
+
+    try {
+      await Promise.all(verifiedDocs.map(doc => kycApi.verifyDocument(entity, id, doc.id, false)))
+    } catch {
+      toast.error('Failed to clear some document verifications')
+      fetchApplication()
+    }
   }
 
   const handleApprove = async () => {
@@ -517,7 +555,7 @@ export default function KycReviewPage() {
                     <EmptyDocuments />
                   ) : (
                     <>
-                      {verificationGroups.regularDocuments.map((document) => (
+                      {verificationGroups.singleDocuments.map((document) => (
                         <DocumentVerificationRow
                           key={document.id}
                           document={document}
@@ -526,29 +564,48 @@ export default function KycReviewPage() {
                         />
                       ))}
 
-                      {/* Seller analytical reports are a group */}
-                      {application.entity === 'seller' &&
-                        verificationGroups.analyticalReports.length > 0 && (
-                          <AnalyticalReportsGroup
-                            documents={verificationGroups.analyticalReports}
-                            verified={analyticalReportsVerified}
+                      {verificationGroups.documentGroups.map((group) => {
+                        const verified = group.documents.every(
+                          (doc) => verifiedDocuments[doc.id] === true
+                        )
+                        return (
+                          <DocumentGroup
+                            key={group.type}
+                            type={group.type}
+                            documents={group.documents}
+                            verified={verified}
                             verifiedDocuments={verifiedDocuments}
                             onVerify={(documentId) => toggleDocumentVerification(documentId)}
-                            onVerifyGroup={() => {
+                            onVerifyGroup={async () => {
+                              if (!entity || !id) return
+
+                              const unverified = group.documents.filter(
+                                (doc) => !verifiedDocuments[doc.id]
+                              )
+                              if (unverified.length === 0) return
+
                               setVerifiedDocuments((current) => {
-                                const next = {
-                                  ...current
-                                }
-
-                                verificationGroups.analyticalReports.forEach((document) => {
-                                  next[document.id] = true
+                                const next = { ...current }
+                                unverified.forEach((doc) => {
+                                  next[doc.id] = true
                                 })
-
                                 return next
                               })
+
+                              try {
+                                await Promise.all(
+                                  unverified.map((doc) =>
+                                    kycApi.verifyDocument(entity, id, doc.id, true)
+                                  )
+                                )
+                              } catch {
+                                toast.error('Failed to save group verification')
+                                fetchApplication()
+                              }
                             }}
                           />
-                        )}
+                        )
+                      })}
                     </>
                   )}
                 </CardContent>
@@ -1035,13 +1092,15 @@ function DocumentVerificationRow({
   )
 }
 
-function AnalyticalReportsGroup({
+function DocumentGroup({
+  type,
   documents,
   verified,
   verifiedDocuments,
   onVerify,
   onVerifyGroup
 }: {
+  type: string
   documents: KycDocument[]
   verified: boolean
   verifiedDocuments: DocumentVerificationState
@@ -1055,7 +1114,7 @@ function AnalyticalReportsGroup({
           <div className="flex items-center gap-2">
             <FileCheck2 className="h-5 w-5 text-primary" />
 
-            <h3 className="font-semibold">Analytical Reports</h3>
+            <h3 className="font-semibold">{documentLabel(type)}</h3>
 
             <Badge variant="secondary">
               {documents.length} {documents.length === 1 ? 'file' : 'files'}
@@ -1063,7 +1122,7 @@ function AnalyticalReportsGroup({
           </div>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            Seller analytical reports are verified as one document group.
+            These documents are verified as one document group.
           </p>
         </div>
 

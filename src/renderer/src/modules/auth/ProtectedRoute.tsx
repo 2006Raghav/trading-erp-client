@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, require: requireModule }: ProtectedRouteProps) {
-  const { user, loading, can } = useAuth()
+  const { user, loading, can, kycApproved } = useAuth()
   const location = useLocation()
 
   // While we're checking the stored token on startup, show a centered spinner.
@@ -27,6 +27,13 @@ export function ProtectedRoute({ children, require: requireModule }: ProtectedRo
   // After login, AuthContext redirects back to this location.
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />
+  }
+
+  // Global KYC Gate: If the user is an exchange user (buyer/seller/mandate)
+  // and is NOT kycApproved, force them to the /kyc-status page.
+  // We allow access if they are already on /kyc-status.
+  if (!kycApproved && location.pathname !== '/kyc-status') {
+    return <Navigate to="/kyc-status" replace />
   }
 
   // Logged in but wrong role — show access denied message instead of redirect.

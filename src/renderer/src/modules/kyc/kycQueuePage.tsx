@@ -2,15 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Building2,
-  CheckCircle2,
   Clock3,
   Eye,
   MoreHorizontal,
   RefreshCcw,
   Search,
   ShieldCheck,
-  XCircle
-} from 'lucide-react'
+  } from 'lucide-react'
 
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
@@ -482,34 +480,7 @@ export function KycQueuePage() {
                               </DropdownMenuItem>
                             )}
 
-                            {application.kycStatus === 'under_review' && (
-                              <>
-                                <DropdownMenuItem
-                                  className="cursor-pointer"
-                                  disabled={isActionLoading}
-                                  onClick={() =>
-                                    handleKycAction(application.entity, application.id, 'approve')
-                                  }
-                                >
-                                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                                  Approve
-                                </DropdownMenuItem>
 
-                                <DropdownMenuItem
-                                  className="cursor-pointer"
-                                  disabled={isActionLoading}
-                                  onClick={() =>
-                                    setRejectTarget({
-                                      entity: application.entity,
-                                      id: application.id
-                                    })
-                                  }
-                                >
-                                  <XCircle className="mr-2 h-4 w-4" />
-                                  Reject
-                                </DropdownMenuItem>
-                              </>
-                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

@@ -33,7 +33,7 @@ import {
   ChevronLeft
 } from 'lucide-react'
 
-import { primaryBtnStyle, cancelBtnStyle } from '../cssUtils'
+import { primaryBtnStyle } from '../cssUtils'
 
 import { useToast } from '../auth/ToastContext'
 
@@ -555,7 +555,7 @@ export function MandateDetail({ mandate, onEdit, onRefresh }: MandateDetailProps
                             )}
 
                             <p className="text-sm font-semibold text-slate-800 mt-1">
-                              {request.productType ?? request.category ?? 'Commodity Request'}
+                              {(request as any).productType ?? (request as any).category ?? 'Commodity Request'}
                             </p>
                           </div>
 
@@ -706,7 +706,7 @@ export function MandateDetail({ mandate, onEdit, onRefresh }: MandateDetailProps
 
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-slate-700 truncate">
-                          {document.documentLabel ?? document.documentType}
+                          {(document as any).documentLabel ?? document.documentType}
                         </p>
 
                         <p className="text-xs text-slate-400 truncate">{document.fileName}</p>
@@ -910,10 +910,10 @@ export function MandateDetail({ mandate, onEdit, onRefresh }: MandateDetailProps
 
           {/* Internal notes */}
 
-          {current.notes && (
+          {(current as any).notes && (
             <Card title="Internal Notes" icon={<FileText size={16} />}>
               <p className="text-sm text-slate-600 whitespace-pre-wrap leading-6">
-                {current.notes}
+                {(current as any).notes}
               </p>
             </Card>
           )}

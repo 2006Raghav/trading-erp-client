@@ -33,7 +33,7 @@ import type {
   CommodityRequestFilters
 } from './commodityRequests.api'
 
-import type { ProductCategory } from '../../lib/types'
+import type { CatalogueCategory } from '../marketplace/marketplace.api'
 
 export function CommodityRequestsPage() {
   const toast = useToast()
@@ -47,7 +47,7 @@ export function CommodityRequestsPage() {
 
   const [selectedRequest, setSelectedRequest] = useState<CommodityRequestDetailModel | null>(null)
 
-  const [categories, setCategories] = useState<ProductCategory[]>([])
+  const [categories, setCategories] = useState<CatalogueCategory[]>([])
 
   const [requests, setRequests] = useState<CommodityRequest[]>([])
 

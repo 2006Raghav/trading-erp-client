@@ -1,7 +1,7 @@
 // src/renderer/src/modules/marketplace/marketplace.api.ts
 
 import { api } from '../../lib/api'
-import type { ApiSuccess, ApiSuccessList, ProductCategory } from '../../lib/types'
+import type { ApiSuccess, ApiSuccessList } from '../../lib/types'
 
 export interface MarketplaceFilters {
   categoryId?: string
@@ -35,10 +35,42 @@ export interface MarketplaceProduct {
   currency?: string
 }
 
-export type MarketplaceCategory = ProductCategory
+export interface MarketplaceCategory {
+  id: string
+  name: string
+  description: string | null
+  image_storage_key: string | null
+  imageUrl: string | null
+  display_order: number
+}
+
+export interface CatalogueCategory {
+  id: string
+  name: string
+  description: string | null
+  image_storage_key: string | null
+  imageUrl: string | null
+  display_order: number
+}
+
+export interface CatalogueType {
+  id: string
+  category_id: string
+  category_name?: string
+  name: string
+  description: string | null
+  standard_unit: string
+  image_storage_key: string | null
+  imageUrl: string | null
+  display_order: number
+}
 
 export const marketplaceApi = {
-  getCategories: () => api.request<ApiSuccess<ProductCategory[]>>('GET', '/products/categories'),
+  getCategories: () =>
+    api.request<ApiSuccess<CatalogueCategory[]>>('GET', '/exchange/marketplace/categories'),
+
+  getTypesByCategory: (categoryId: string) =>
+    api.request<ApiSuccess<CatalogueType[]>>('GET', `/exchange/marketplace/categories/${categoryId}/types`),
 
   getAll: (filters: MarketplaceFilters = {}) => {
     // 1. Create a clean object by stripping out undefined, null, and empty strings
