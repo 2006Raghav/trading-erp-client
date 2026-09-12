@@ -1,6 +1,5 @@
-// src/renderer/src/modules/inquiries/InquiriesPage.tsx
-
 import { useState, useEffect, useCallback } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   Search,
   RefreshCw,
@@ -35,7 +34,7 @@ import {
   type InquiryStats,
   type RequestStatus
 } from './adminInquiries.api'
-import { InquiryDetailDrawer } from './InquiryDetailDrawer'
+import { InquiryDetail } from './InquiryDetail'
 import { AssignSellerModal } from './AssignSellerModal'
 import { marketplaceApi } from '../marketplace/marketplace.api'
 import type { CatalogueCategory } from '../marketplace/marketplace.api'
@@ -78,6 +77,8 @@ const STATUS_BADGE: Record<
 }
 
 export function InquiriesPage() {
+  const navigate = useNavigate()
+  const { id: paramId, '*': wildcardId } = useParams<{ id?: string; '*': string }>()
   const [requests, setRequests] = useState<AdminCommodityRequest[]>([])
   const [stats, setStats] = useState<InquiryStats | null>(null)
   const [categories, setCategories] = useState<CatalogueCategory[]>([])
@@ -98,9 +99,12 @@ export function InquiriesPage() {
 
   // Drawer & Modal State
   const [selectedRequest, setSelectedRequest] = useState<AdminCommodityRequest | null>(null)
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const [assignModalOpen, setAssignModalOpen] = useState(false)
   const [assignModalRequest, setAssignModalRequest] = useState<AdminCommodityRequest | null>(null)
+
+  // Determine active inquiry ID from URL or state
+  const rawParamId = paramId || (wildcardId && wildcardId.trim() !== '' ? wildcardId.replace(/^\//, '') : null)
+  const activeInquiryId = rawParamId || (selectedRequest ? selectedRequest.id : null)
 
   // Load Categories for filter
   useEffect(() => {
@@ -130,11 +134,12 @@ export function InquiriesPage() {
         setTotal(res.meta.total)
         setTotalPages(res.meta.totalPages)
 
-        // If drawer is open, keep selected request synchronized
-        if (selectedRequest) {
-          const updated = res.data.find((r) => r.id === selectedRequest.id)
-          if (updated) setSelectedRequest(updated)
-        }
+        // If detail is open, keep selected request synchronized
+        setSelectedRequest((prev) => {
+          if (!prev) return null
+          const updated = res.data.find((r) => r.id === prev.id)
+          return updated || prev
+        })
       }
     } catch (err) {
       console.error('Failed to load inquiries', err)
@@ -142,7 +147,7 @@ export function InquiriesPage() {
       setLoading(false)
       setRefreshing(false)
     }
-  }, [page, pageSize, search, statusFilter, categoryFilter, assignmentFilter, selectedRequest])
+  }, [page, pageSize, search, statusFilter, categoryFilter, assignmentFilter])
 
   useEffect(() => {
     loadData()
@@ -159,7 +164,13 @@ export function InquiriesPage() {
 
   const handleOpenDetail = (req: AdminCommodityRequest) => {
     setSelectedRequest(req)
-    setDrawerOpen(true)
+    navigate(`/inquiries/${req.id}`)
+  }
+
+  const handleBack = () => {
+    setSelectedRequest(null)
+    navigate('/inquiries')
+    loadData()
   }
 
   const handleOpenAssignModal = (req: AdminCommodityRequest) => {
@@ -181,6 +192,38 @@ export function InquiriesPage() {
     categoryFilter !== 'all' ||
     assignmentFilter !== 'all'
 
+  if (activeInquiryId) {
+    return (
+      <div className="absolute inset-0 z-50 bg-[var(--color-canvas-50)] flex flex-col h-full overflow-hidden">
+        <InquiryDetail 
+          inquiryId={activeInquiryId} 
+          onBack={handleBack} 
+          onOpenAssignModal={(req) => handleOpenAssignModal(req)} 
+        />
+        {/* We keep the AssignSellerModal here so it can overlay over the InquiryDetail if opened from it */}
+        {assignModalRequest && (
+          <AssignSellerModal
+            isOpen={assignModalOpen}
+            onClose={() => {
+              setAssignModalOpen(false)
+              setAssignModalRequest(null)
+            }}
+            requestId={assignModalRequest.id}
+            requestTitle={assignModalRequest.displayName}
+            buyerName={assignModalRequest.buyerCompanyName}
+            quantityStr={`${assignModalRequest.quantity.toLocaleString()} ${assignModalRequest.quantityUnit}`}
+            currentSellerId={assignModalRequest.assignedSellerId}
+            currentSellerName={assignModalRequest.sellerCompanyName}
+            commodityTypeId={assignModalRequest.commodityTypeId}
+            onSuccess={() => {
+              loadData()
+            }}
+          />
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6 pb-12">
       {/* ── Page Header ──────────────────────────────────────────────────────── */}
@@ -191,7 +234,7 @@ export function InquiriesPage() {
               Commodity Inquiries & Requests
             </h1>
             {stats && (
-              <Badge variant="secondary" className="font-mono font-semibold text-xs">
+              <Badge variant="secondary" className="font-mono font-semibold text-xs px-2.5 py-0.5 inline-flex items-center justify-center leading-none">
                 {stats.total} Total
               </Badge>
             )}
@@ -492,7 +535,7 @@ export function InquiriesPage() {
                         <div className="font-semibold text-[var(--color-ink-900)] flex items-center gap-1.5">
                           {req.displayName}
                           {req.isCustomCategory && (
-                            <Badge variant="outline" className="text-[9px] py-0 px-1 border-amber-300 text-amber-700 bg-amber-50">
+                            <Badge variant="outline" className="text-[9px] font-semibold py-0.5 px-1.5 border-amber-300 text-amber-700 bg-amber-50 inline-flex items-center justify-center leading-none">
                               Custom
                             </Badge>
                           )}
@@ -567,7 +610,7 @@ export function InquiriesPage() {
                       {/* Status */}
                       <td className="py-3.5 px-4">
                         <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}
+                          className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold leading-none border ${statusConfig.bg} ${statusConfig.text} ${statusConfig.border}`}
                         >
                           {statusConfig.label}
                         </span>
@@ -623,21 +666,9 @@ export function InquiriesPage() {
         )}
       </div>
 
-      {/* ── Detail Drawer ────────────────────────────────────────────────────── */}
-      <InquiryDetailDrawer
-        isOpen={drawerOpen}
-        onClose={() => {
-          setDrawerOpen(false)
-          setSelectedRequest(null)
-        }}
-        request={selectedRequest}
-        onRefresh={() => loadData()}
-        onOpenAssignModal={(req) => {
-          setDrawerOpen(false)
-          handleOpenAssignModal(req)
-        }}
-      />
-
+      {/* ── Detail Drawer / Full Page ────────────────────────────────────────── */}
+      {/* We are now using a conditional full-page layout for the 3-panel workspace */}
+      
       {/* ── Assign Seller Modal ──────────────────────────────────────────────── */}
       {assignModalRequest && (
         <AssignSellerModal
@@ -652,6 +683,7 @@ export function InquiriesPage() {
           quantityStr={`${assignModalRequest.quantity.toLocaleString()} ${assignModalRequest.quantityUnit}`}
           currentSellerId={assignModalRequest.assignedSellerId}
           currentSellerName={assignModalRequest.sellerCompanyName}
+          commodityTypeId={assignModalRequest.commodityTypeId}
           onSuccess={() => {
             loadData()
           }}

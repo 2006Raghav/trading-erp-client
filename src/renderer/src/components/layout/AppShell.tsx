@@ -3,6 +3,7 @@ import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { useAuth } from '../../modules/auth/AuthContext'
 import { KycStatusBanner } from '../../modules/registration/KycStatusBanner'
+import { EnableNotificationsBanner } from '../notifications/EnableNotificationsBanner'
 
 export function AppShell() {
   const { kycStatus } = useAuth()
@@ -16,10 +17,10 @@ export function AppShell() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
 
+        <EnableNotificationsBanner />
+
         {/* KYC status banner — shown for exchange users who are not yet approved */}
-        {kycStatus && kycStatus !== 'approved' && (
-          <KycStatusBanner kycStatus={kycStatus} />
-        )}
+        {kycStatus && kycStatus !== 'approved' && <KycStatusBanner kycStatus={kycStatus} />}
 
         {/* <Outlet /> renders the matched child route component (Dashboard, Buyers, etc.) */}
         <main className="flex-1 overflow-y-auto p-6">

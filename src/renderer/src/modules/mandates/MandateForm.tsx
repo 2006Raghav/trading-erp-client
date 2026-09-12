@@ -119,10 +119,10 @@ export function MandateForm({ mandate, onSuccess, onCancel }: MandateFormProps) 
       minHeight: '40px',
       fontSize: '14px',
       lineHeight: '20px',
-      border: `1px solid ${hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'}`,
+      border: `1px solid ${hasError ? 'var(--danger-text)' : 'var(--border)'}`,
       borderRadius: '8px',
-      background: hasError ? 'var(--color-danger-bg)' : 'var(--color-white)',
-      color: 'var(--color-ink-900)',
+      background: hasError ? 'var(--danger-bg)' : 'var(--bg-canvas)',
+      color: 'var(--text-primary)',
       outline: 'none',
       fontFamily: 'var(--font-ui)'
     }
@@ -131,16 +131,16 @@ export function MandateForm({ mandate, onSuccess, onCancel }: MandateFormProps) 
   function onFocus(
     e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) {
-    e.target.style.borderColor = 'var(--color-cobalt-600)'
+    e.target.style.borderColor = 'var(--action)'
 
-    e.target.style.boxShadow = '0 0 0 2px var(--color-cobalt-100)'
+    e.target.style.boxShadow = '0 0 0 2px var(--action-tint-strong)'
   }
 
   function onBlur(
     e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
     hasError: boolean
   ) {
-    e.target.style.borderColor = hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'
+    e.target.style.borderColor = hasError ? 'var(--danger-text)' : 'var(--border)'
 
     e.target.style.boxShadow = ''
   }
@@ -252,13 +252,13 @@ export function MandateForm({ mandate, onSuccess, onCancel }: MandateFormProps) 
                 style={{
                   borderColor:
                     form.represents === 'buyer_side'
-                      ? 'var(--color-cobalt-600)'
-                      : 'var(--color-slate-200)',
+                      ? 'var(--action)'
+                      : 'var(--border)',
 
                   background:
                     form.represents === 'buyer_side'
-                      ? 'var(--color-cobalt-50)'
-                      : 'var(--color-white)'
+                      ? 'var(--action-tint)'
+                      : 'var(--bg-card)'
                 }}
               >
                 <p
@@ -266,14 +266,14 @@ export function MandateForm({ mandate, onSuccess, onCancel }: MandateFormProps) 
                   style={{
                     color:
                       form.represents === 'buyer_side'
-                        ? 'var(--color-cobalt-700)'
-                        : 'var(--color-ink-900)'
+                        ? 'var(--action-hover)'
+                        : 'var(--text-primary)'
                   }}
                 >
                   Buyer Side
                 </p>
 
-                <p className="text-xs text-slate-400 mt-1">Represents commodity buyers</p>
+                <p className="text-xs text-[var(--text-secondary)] mt-1">Represents commodity buyers</p>
               </button>
 
               <button
@@ -283,13 +283,13 @@ export function MandateForm({ mandate, onSuccess, onCancel }: MandateFormProps) 
                 style={{
                   borderColor:
                     form.represents === 'seller_side'
-                      ? 'var(--color-warning)'
-                      : 'var(--color-slate-200)',
+                      ? 'var(--warning-text)'
+                      : 'var(--border)',
 
                   background:
                     form.represents === 'seller_side'
-                      ? 'var(--color-warning-bg)'
-                      : 'var(--color-white)'
+                      ? 'var(--warning-bg)'
+                      : 'var(--bg-card)'
                 }}
               >
                 <p
@@ -297,8 +297,8 @@ export function MandateForm({ mandate, onSuccess, onCancel }: MandateFormProps) 
                   style={{
                     color:
                       form.represents === 'seller_side'
-                        ? 'var(--color-warning)'
-                        : 'var(--color-ink-900)'
+                        ? 'var(--warning-text)'
+                        : 'var(--text-primary)'
                   }}
                 >
                   Seller Side

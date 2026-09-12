@@ -1,0 +1,452 @@
+.not-found-page {
+  --not-found-sky: var(--bg-canvas);
+  --not-found-text: var(--text-primary);
+  --not-found-muted: var(--text-secondary);
+  position: relative;
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 32px 20px;
+  color: var(--not-found-text);
+  background: radial-gradient(circle at 50% 42%, var(--bg-elevated), var(--not-found-sky) 67%);
+  font-family: var(--font-ui);
+}
+.not-found-page::before,
+.not-found-page::after {
+  position: absolute;
+  z-index: -1;
+  width: min(62vw, 680px);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--action) 18%, transparent);
+  border-radius: 50%;
+  content: '';
+}
+.not-found-page::before {
+  transform: translate(-36%, 17%);
+}
+.not-found-page::after {
+  transform: translate(48%, -35%);
+}
+.not-found-content {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 520px);
+  text-align: center;
+}
+.not-found-eyebrow {
+  margin: 0 0 10px;
+  color: var(--action-hover);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.not-found-content h1 {
+  margin: 0;
+  font-size: clamp(72px, 15vw, 132px);
+  line-height: 0.82;
+  letter-spacing: -0.085em;
+  font-weight: 700;
+}
+.not-found-content h2 {
+  margin: 21px 0 9px;
+  font-size: clamp(20px, 4vw, 28px);
+  line-height: 1.2;
+  font-weight: 600;
+}
+.not-found-copy {
+  max-width: 430px;
+  margin: 0 auto;
+  color: var(--not-found-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.not-found-art {
+  position: relative;
+  width: min(100%, 520px);
+  height: clamp(170px, 27vw, 220px);
+  margin: 0 auto;
+}
+.not-found-visual-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.not-found-visual-layer > .not-found-art {
+  position: absolute;
+  top: 58%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.not-found-illustration {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.not-found-night {
+  display: none;
+}
+.not-found-rays {
+  fill: none;
+  stroke: var(--color-metal-gold);
+  stroke-linecap: round;
+  stroke-width: 5;
+}
+.not-found-sun {
+  fill: var(--color-metal-gold);
+}
+.not-found-cloud-back {
+  fill: var(--bg-card);
+  stroke: var(--border);
+  stroke-width: 2;
+}
+.not-found-cloud-front {
+  fill: var(--bg-elevated);
+  stroke: var(--border);
+  stroke-width: 2;
+}
+.not-found-stars {
+  display: none;
+}
+.not-found-stars i {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--text-primary);
+  opacity: 0.45;
+  animation: not-found-twinkle 3.2s ease-in-out infinite;
+  animation-delay: calc(var(--star-index) * -170ms);
+}
+.not-found-stars i:nth-child(1) {
+  left: 8%;
+  top: 12%;
+}
+.not-found-stars i:nth-child(2) {
+  left: 18%;
+  top: 26%;
+}
+.not-found-stars i:nth-child(3) {
+  left: 32%;
+  top: 9%;
+}
+.not-found-stars i:nth-child(4) {
+  left: 51%;
+  top: 17%;
+}
+.not-found-stars i:nth-child(5) {
+  left: 71%;
+  top: 8%;
+}
+.not-found-stars i:nth-child(6) {
+  left: 89%;
+  top: 22%;
+}
+.not-found-stars i:nth-child(7) {
+  left: 12%;
+  top: 63%;
+}
+.not-found-stars i:nth-child(8) {
+  left: 26%;
+  top: 78%;
+}
+.not-found-stars i:nth-child(9) {
+  left: 45%;
+  top: 88%;
+}
+.not-found-stars i:nth-child(10) {
+  left: 68%;
+  top: 72%;
+}
+.not-found-stars i:nth-child(11) {
+  left: 91%;
+  top: 81%;
+}
+.not-found-stars i:nth-child(12) {
+  left: 79%;
+  top: 51%;
+}
+.not-found-stars i:nth-child(n + 13) {
+  left: calc(var(--star-index) * 3%);
+  top: calc(var(--star-index) * 2%);
+}
+.not-found-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.not-found-actions button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 0 15px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
+}
+.not-found-actions button:hover {
+  transform: translateY(-1px);
+}
+.not-found-actions button:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 3px;
+}
+.not-found-primary {
+  border: 1px solid var(--action);
+  background: var(--action);
+  color: var(--primary-foreground);
+}
+.not-found-primary:hover {
+  background: var(--action-hover);
+  border-color: var(--action-hover);
+}
+.not-found-secondary {
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-primary);
+}
+.not-found-secondary:hover {
+  background: var(--bg-hover);
+}
+.dark .not-found-page,
+[data-theme='dark'] .not-found-page {
+  --not-found-sky: var(--bg-sidebar);
+  background: radial-gradient(circle at 50% 46%, var(--bg-elevated), var(--not-found-sky) 66%);
+}
+.dark .not-found-stars,
+[data-theme='dark'] .not-found-stars {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+.dark .not-found-day,
+[data-theme='dark'] .not-found-day {
+  display: none;
+}
+.dark .not-found-night,
+[data-theme='dark'] .not-found-night {
+  display: block;
+}
+.dark .not-found-content h1,
+[data-theme='dark'] .not-found-content h1 {
+  text-shadow: 0 10px 30px color-mix(in srgb, var(--bg-canvas) 55%, transparent);
+}
+.dark .not-found-eyebrow,
+[data-theme='dark'] .not-found-eyebrow {
+  color: var(--info-text);
+}
+.dark .not-found-orbit,
+[data-theme='dark'] .not-found-orbit {
+  fill: none;
+  stroke: var(--action-tint-strong);
+  stroke-opacity: 0.6;
+}
+.dark .not-found-orbit-dash,
+[data-theme='dark'] .not-found-orbit-dash {
+  fill: none;
+  stroke: var(--info-text);
+  stroke-dasharray: 4 7;
+  stroke-opacity: 0.7;
+}
+.dark .not-found-planet,
+[data-theme='dark'] .not-found-planet {
+  fill: var(--danger-text);
+}
+.dark .not-found-planet-shade,
+[data-theme='dark'] .not-found-planet-shade {
+  fill: color-mix(in srgb, var(--danger-text) 55%, var(--bg-sidebar));
+  opacity: 0.65;
+}
+.dark .not-found-crater-large,
+.dark .not-found-crater,
+[data-theme='dark'] .not-found-crater-large,
+[data-theme='dark'] .not-found-crater {
+  fill: color-mix(in srgb, var(--danger-text) 45%, var(--bg-sidebar));
+  opacity: 0.55;
+}
+.dark .not-found-sparkle,
+[data-theme='dark'] .not-found-sparkle {
+  fill: var(--text-primary);
+}
+@keyframes not-found-twinkle {
+  50% {
+    opacity: 0.95;
+    transform: scale(1.5);
+  }
+}
+@media (max-width: 460px) {
+  .not-found-page {
+    padding: 28px 18px;
+  }
+  .not-found-actions {
+    flex-direction: column-reverse;
+    width: min(100%, 280px);
+    margin-inline: auto;
+  }
+  .not-found-actions button {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .not-found-stars i {
+    animation: none;
+  }
+  .not-found-actions button {
+    transition: none;
+  }
+}
+
+/* Light sky: a few CSS-only cloud layers keep the scene calm and inexpensive to render. */
+.not-found-page {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--action) 62%, var(--bg-card)),
+    color-mix(in srgb, var(--info-bg) 82%, var(--bg-card)) 58%,
+    var(--bg-canvas)
+  );
+}
+.not-found-clouds {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+.not-found-clouds i {
+  position: absolute;
+  width: 110px;
+  height: 28px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-white) 84%, transparent);
+  box-shadow:
+    28px -16px 0 5px color-mix(in srgb, var(--color-white) 84%, transparent),
+    62px -7px 0 1px color-mix(in srgb, var(--color-white) 84%, transparent),
+    82px 3px 0 -4px color-mix(in srgb, var(--color-white) 84%, transparent);
+  filter: drop-shadow(0 7px 9px color-mix(in srgb, var(--action) 9%, transparent));
+  opacity: 0.76;
+  animation: not-found-cloud-drift 78s ease-in-out infinite alternate;
+}
+.not-found-clouds i:nth-child(1) {
+  top: 10%;
+  left: -16%;
+  transform: scale(0.7);
+  animation-duration: 88s;
+}
+.not-found-clouds i:nth-child(2) {
+  top: 21%;
+  left: 69%;
+  transform: scale(1.12);
+  animation-duration: 106s;
+  animation-delay: -34s;
+}
+.not-found-clouds i:nth-child(3) {
+  top: 38%;
+  left: -8%;
+  transform: scale(0.9);
+  animation-duration: 95s;
+  animation-delay: -59s;
+}
+.not-found-clouds i:nth-child(4) {
+  top: 52%;
+  left: 65%;
+  transform: scale(0.62);
+  animation-duration: 73s;
+  animation-delay: -15s;
+}
+.not-found-clouds i:nth-child(5) {
+  top: 67%;
+  left: 27%;
+  transform: scale(1.3);
+  animation-duration: 118s;
+  animation-delay: -76s;
+}
+.not-found-clouds i:nth-child(6) {
+  top: 81%;
+  left: -13%;
+  transform: scale(0.55);
+  animation-duration: 82s;
+  animation-delay: -45s;
+}
+.not-found-clouds i:nth-child(7) {
+  top: 8%;
+  left: 39%;
+  transform: scale(0.42);
+  animation-duration: 69s;
+  animation-delay: -24s;
+}
+.not-found-clouds i:nth-child(8) {
+  top: 31%;
+  left: 35%;
+  transform: scale(0.64);
+  animation-duration: 97s;
+  animation-delay: -68s;
+}
+.not-found-clouds i:nth-child(9) {
+  top: 45%;
+  left: 84%;
+  transform: scale(0.82);
+  animation-duration: 110s;
+  animation-delay: -38s;
+}
+.not-found-clouds i:nth-child(10) {
+  top: 63%;
+  left: 42%;
+  transform: scale(0.48);
+  animation-duration: 76s;
+  animation-delay: -83s;
+}
+.not-found-clouds i:nth-child(11) {
+  top: 88%;
+  left: 72%;
+  transform: scale(0.78);
+  animation-duration: 102s;
+  animation-delay: -57s;
+}
+.not-found-day {
+  filter: drop-shadow(0 0 18px color-mix(in srgb, var(--color-metal-gold) 72%, transparent))
+    brightness(1.12);
+  animation: not-found-sun-glow 4s ease-in-out infinite alternate;
+}
+@keyframes not-found-cloud-drift {
+  to {
+    translate: 13vw 0;
+  }
+}
+@keyframes not-found-sun-glow {
+  to {
+    filter: drop-shadow(0 0 30px color-mix(in srgb, var(--color-metal-gold) 92%, transparent))
+      brightness(1.28);
+  }
+}
+.dark .not-found-page,
+[data-theme='dark'] .not-found-page {
+  background: radial-gradient(circle at 50% 46%, var(--bg-elevated), var(--bg-sidebar) 66%);
+}
+.dark .not-found-clouds,
+[data-theme='dark'] .not-found-clouds {
+  display: none;
+}
+.dark .not-found-day,
+[data-theme='dark'] .not-found-day {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .not-found-clouds i,
+  .not-found-day {
+    animation: none;
+  }
+}

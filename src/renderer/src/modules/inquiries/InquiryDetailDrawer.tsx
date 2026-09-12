@@ -41,6 +41,7 @@ import {
   type AdminCommodityRequest,
   type RequestStatus
 } from './adminInquiries.api'
+import { DocumentPanel } from './DocumentPanel'
 
 interface InquiryDetailDrawerProps {
   isOpen: boolean
@@ -163,7 +164,7 @@ export function InquiryDetailDrawer({
 
   return (
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <SheetContent className="w-full sm:max-w-2xl overflow-y-auto p-0 border-l border-[var(--color-slate-200)] shadow-2xl flex flex-col bg-white">
+      <SheetContent className="w-full sm:max-w-6xl overflow-y-auto p-0 border-l border-[var(--color-slate-200)] shadow-2xl flex flex-col bg-white">
         {/* Header */}
         <SheetHeader className="p-6 border-b border-[var(--color-slate-100)] bg-[var(--color-canvas-50)]">
           <div className="flex items-start justify-between gap-4">
@@ -192,10 +193,10 @@ export function InquiryDetailDrawer({
 
             <div className="shrink-0 flex flex-col items-end gap-2">
               <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusInfo.bg} ${statusInfo.text} ${statusInfo.border}`}
+                className={`inline-flex items-center justify-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold leading-none border ${statusInfo.bg} ${statusInfo.text} ${statusInfo.border}`}
               >
                 <StatusIcon className="h-3.5 w-3.5" />
-                {statusInfo.label}
+                <span>{statusInfo.label}</span>
               </span>
             </div>
           </div>
@@ -228,8 +229,15 @@ export function InquiryDetailDrawer({
         </SheetHeader>
 
         {/* Content Body */}
-        <div className="p-6 space-y-6 flex-1">
-          {/* Custom Category Banner */}
+        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 flex-1">
+          {/* Left Column: Documents */}
+          <div className="col-span-1 space-y-6">
+            <DocumentPanel inquiryId={request.id} />
+          </div>
+
+          {/* Right Column: Existing Details */}
+          <div className="col-span-2 space-y-6">
+            {/* Custom Category Banner */}
           {request.isCustomCategory && (
             <div className="flex gap-3 rounded-xl border border-amber-200 bg-amber-50/70 p-4">
               <Sparkles className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
@@ -513,6 +521,7 @@ export function InquiryDetailDrawer({
               placeholder="Record negotiation status, supplier pricing feedback, or verification remarks..."
               className="text-xs h-24 resize-none"
             />
+          </div>
           </div>
         </div>
       </SheetContent>

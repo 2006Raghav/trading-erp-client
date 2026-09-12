@@ -112,10 +112,10 @@ export function DocumentUploadRow({
       className={[
         'rounded-lg border p-4 transition-colors',
         isDragging
-          ? 'border-[var(--color-slate-400)] bg-[var(--color-canvas-50)]'
+          ? 'border-[var(--action)] bg-[var(--action-tint)]'
           : isFlagged
-            ? 'border-[var(--color-danger)] bg-[var(--color-danger-bg)]'
-            : 'border-[var(--color-slate-200)] bg-white'
+            ? 'border-[var(--danger-text)] bg-[var(--danger-bg)]'
+            : 'border-[var(--border)] bg-[var(--bg-card)]'
       ].join(' ')}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
@@ -129,8 +129,8 @@ export function DocumentUploadRow({
             className={[
               'mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-md',
               hasDocuments
-                ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]'
-                : 'bg-[var(--color-canvas-50)] text-[var(--color-slate-500)]'
+                ? 'bg-[var(--success-bg)] text-[var(--success-text)]'
+                : 'bg-[var(--bg-canvas)] text-[var(--text-secondary)]'
             ].join(' ')}
           >
             {hasDocuments ? <CheckCircle2 className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
@@ -138,23 +138,23 @@ export function DocumentUploadRow({
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h4 className="text-sm font-semibold text-[var(--color-ink-900)]">{label}</h4>
+              <h4 className="text-sm font-semibold text-[var(--text-primary)]">{label}</h4>
 
               <span
                 className={[
                   'rounded-full px-2 py-0.5 text-[10px] font-semibold',
                   isFlagged
-                    ? 'bg-[var(--color-danger)] text-white'
+                    ? 'bg-[var(--danger-text)] text-white'
                     : hasDocuments
-                      ? 'bg-[var(--color-success-bg)] text-[var(--color-success)]'
-                      : 'bg-[var(--color-slate-100)] text-[var(--color-slate-600)]'
+                      ? 'bg-[var(--success-bg)] text-[var(--success-text)]'
+                      : 'bg-[var(--bg-canvas)] text-[var(--text-secondary)] border border-[var(--border)]'
                 ].join(' ')}
               >
                 {isFlagged ? 'Action Required' : hasDocuments ? 'Uploaded' : 'Required'}
               </span>
             </div>
 
-            <p className="mt-1 text-xs text-[var(--color-slate-500)]">
+            <p className="mt-1 text-xs text-[var(--text-secondary)]">
               PDF, JPG, PNG, or DOCX · Max 20MB
             </p>
 
@@ -172,11 +172,11 @@ export function DocumentUploadRow({
                   return (
                     <div
                       key={document.id}
-                      className="flex items-center gap-2 rounded-md bg-[var(--color-canvas-50)] px-3 py-2"
+                      className="flex items-center gap-2 rounded-md bg-[var(--bg-canvas)] px-3 py-2"
                     >
-                      <FileText className="h-3.5 w-3.5 shrink-0 text-[var(--color-slate-500)]" />
+                      <FileText className="h-3.5 w-3.5 shrink-0 text-[var(--text-secondary)]" />
 
-                      <span className="min-w-0 flex-1 truncate text-xs text-[var(--color-ink-900)]">
+                      <span className="min-w-0 flex-1 truncate text-xs text-[var(--text-primary)]">
                         {name || 'Uploaded document'}
                       </span>
 
@@ -185,7 +185,7 @@ export function DocumentUploadRow({
                         disabled={uploading}
                         onClick={() => void onRemove(document)}
                         aria-label={`Remove ${name || 'document'}`}
-                        className="shrink-0 text-[var(--color-slate-500)] hover:text-[var(--color-danger)] disabled:cursor-not-allowed disabled:opacity-50"
+                        className="shrink-0 text-[var(--text-secondary)] hover:text-[var(--danger-text)] disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -198,7 +198,7 @@ export function DocumentUploadRow({
             {/* MULTI FILE NOTE */}
 
             {multiple && (
-              <p className="mt-3 text-[11px] leading-5 text-[var(--color-slate-500)]">
+              <p className="mt-3 text-[11px] leading-5 text-[var(--text-secondary)]">
                 Multiple files may be uploaded for this document type.
               </p>
             )}
@@ -223,8 +223,8 @@ export function DocumentUploadRow({
             className={[
               'inline-flex h-9 items-center rounded-md border px-3 text-xs font-semibold transition-colors',
               uploading
-                ? 'pointer-events-none border-[var(--color-slate-200)] text-[var(--color-slate-500)]'
-                : 'cursor-pointer border-[var(--color-slate-200)] bg-white text-[var(--color-ink-900)] hover:bg-[var(--color-canvas-50)]'
+                ? 'pointer-events-none border-[var(--border)] text-[var(--text-secondary)]'
+                : 'cursor-pointer border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
             ].join(' ')}
           >
             {uploading ? (
