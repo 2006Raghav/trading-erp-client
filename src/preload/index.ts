@@ -1,4 +1,4 @@
-import { contextBridge, app } from 'electron'
+import { contextBridge, app, ipcRenderer } from 'electron'
 
 contextBridge.exposeInMainWorld('electron', {
   // Which OS the app is running on
@@ -11,6 +11,9 @@ contextBridge.exposeInMainWorld('electron', {
 
   // From package.json — displayed in the UI if needed
   appVersion: app.getVersion(),
+
+  // Restore and focus the window when an OS notification is clicked.
+  focusWindow: () => ipcRenderer.invoke('window:focus'),
 
   // Node/Electron/Chrome versions for diagnostics
   process: {

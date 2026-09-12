@@ -22,11 +22,16 @@ import { MandatesPage } from './modules/mandates/MandatesPage'
 import { KycStatusPage } from './modules/registration/KycStatusPage'
 import { CategoriesPage } from './modules/catalogue/CategoriesPage'
 import { InquiriesPage } from './modules/inquiries/InquiriesPage'
+import { MyDealsPage } from './modules/exchange/deals/MyDealsPage'
+import { DealDetailPage } from './modules/exchange/deals/DealDetailPage'
+import { ChangePasswordPage } from './modules/auth/ChangePasswordPage'
+import { ProfilePage } from './modules/auth/ProfilePage'
+import { NotFoundPage } from './components/errors/NotFoundPage'
+
 export default function App() {
   return (
     // AuthProvider holds the current user, login/logout functions, and role checks.
     // ToastProvider holds the toast queue and renders the fixed toast container.
-    // Both wrap everything because any component might need them.
     <AuthProvider>
       <ToastProvider>
         <Routes>
@@ -42,8 +47,8 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            {/* Default: redirect root to marketplace (which protected route will handle or redirect to dashboard if admin) */}
-            <Route index element={<Navigate to="/marketplace" replace />} />
+            {/* Default: redirect root to dashboard per spec */}
+            <Route index element={<Navigate to="/dashboard" replace />} />
             {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
             {/* Module routes: ProtectedRoute with `require` also checks role permission */}
             <Route
@@ -119,10 +124,42 @@ export default function App() {
               }
             />
             <Route
+              path="/inquiries"
+              element={
+                <ProtectedRoute require="inquiries">
+                  <InquiriesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/inquiries/:id"
+              element={
+                <ProtectedRoute require="inquiries">
+                  <InquiriesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/inquiries/*"
               element={
                 <ProtectedRoute require="inquiries">
                   <InquiriesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-deals"
+              element={
+                <ProtectedRoute require="myDeals">
+                  <MyDealsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-deals/:id"
+              element={
+                <ProtectedRoute require="myDeals">
+                  <DealDetailPage />
                 </ProtectedRoute>
               }
             />
@@ -160,11 +197,28 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
+            {/* User Security & Profile */}
+            <Route
+              path="/change-password"
+              element={
+                <ProtectedRoute>
+                  <ChangePasswordPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
           </Route>
-          {/* Catch-all: unknown URL → marketplace */}
-          <Route path="*" element={<Navigate to="/marketplace" replace />} />
-        </Routes>
-      </ToastProvider>
-    </AuthProvider>
+            {/* Catch-all: unknown URL → marketplace */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </ToastProvider>
+      </AuthProvider>
   )
 }

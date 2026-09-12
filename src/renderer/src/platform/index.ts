@@ -10,6 +10,7 @@ declare global {
     electron?: {
       isElectron: boolean
       appVersion?: string
+      focusWindow?: () => Promise<void>
     }
   }
 }
