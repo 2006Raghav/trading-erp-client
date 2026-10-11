@@ -14,6 +14,9 @@ declare global {
       // App version from package.json — shown in sidebar footer
       appVersion: string
 
+      // Restores and focuses the desktop window after a native notification click.
+      focusWindow: () => Promise<void>
+
       // process.versions — useful for diagnostics (Electron, Chrome, Node versions)
       // Only available inside Electron, never in a browser
       process: {

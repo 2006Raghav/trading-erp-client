@@ -4,89 +4,404 @@
 @import 'tw-animate-css';
 @import '@fontsource-variable/inter';
 
-@custom-variant dark (&:is(.dark *));
-/* ── Design Token Definitions ─────────────────────────────────────────────── */
-/* All colors in the app trace to one of these variables.
-   To retheme: edit values here only. Components never use raw hex. */
+/* Custom dark variant for Tailwind v4: works with both .dark class and [data-theme="dark"] attribute */
+@custom-variant dark (&:is(.dark *, [data-theme="dark"] *));
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DESIGN TOKEN DEFINITIONS
+   Source of truth:
+     BRAND_GUIDE.md §2 (Color System) & §3 (Typography) & §5 (Components)
+     DASHBOARD_NOTIFICATIONS_DARKMODE_SPEC.md §4.2 & §4.3 (Dark Mode & Tokens)
+
+   Architecture:
+   1. Raw palette tokens (--color-*) declared on :root — never change per theme
+   2. Semantic surface tokens (--bg-*, --text-*, --border-*, --action-*, --header-*)
+      declared on :root (light) and overridden on .dark / [data-theme="dark"]
+   3. Both raw palette and semantic tokens are mapped to Tailwind v4 @theme
+   ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  /* Neutral / Chrome */
-  --color-navy-950: #16244a; /* sidebar background */
-  --color-navy-900: #1e2f5c; /* sidebar hover rows */
-  --color-navy-700: #2c4172; /* dividers on dark surfaces */
-  --color-canvas-50: #f5f8fc; /* main content background */
-  --color-azure-100: #e1f1fe; /* section wash, table stripe */
-  --color-white: #ffffff; /* cards, modals, table rows */
-  --color-ink-900: #0f1729; /* primary text on white */
-  --color-slate-500: #64748b; /* secondary/muted text */
-  --color-slate-300: #cbd3de; /* inactive icons, disabled text */
-  --color-slate-200: #e4e8ee; /* borders/dividers on white */
+  /* ── Neutral / Chrome (BRAND_GUIDE §2.1) ────────────────────────────────── */
+  --color-navy-950: #16244A;        /* sidebar background, darkest chrome */
+  --color-navy-900: #1E2F5C;        /* sidebar hover rows */
+  --color-navy-800: #132042;        /* dark surface hover */
+  --color-navy-700: #2C4172;        /* dividers on dark surfaces */
+  --color-canvas-50: #F5F8FC;       /* main content background */
+  --color-azure-100: #E1F1FE;       /* section wash, table stripe */
+  --color-white: #FFFFFF;           /* cards, modals, table rows */
+  --color-ink-900: #0F1729;         /* primary text on white */
+  --color-slate-500: #64748B;       /* secondary/muted text */
+  --color-slate-400: #94A3B8;       /* secondary helper text */
+  --color-slate-300: #CBD3DE;       /* inactive icons, disabled text */
+  --color-slate-200: #E4E8EE;       /* borders/dividers on white */
 
-  /* Primary — Cobalt (action color) */
-  --color-cobalt-700: #1b3fbe; /* button hover/active */
-  --color-cobalt-600: #2554e8; /* buttons, active nav, links, focus rings */
-  --color-cobalt-100: #dce6ff; /* selected row highlight, icon tints */
-  --color-cobalt-50: #eef3ff; /* hover fill on white surfaces */
+  /* Reserved dark tokens (BRAND_GUIDE §2.1 & SPEC §4.2) */
+  --color-abyss-950: #0B1220;
+  --color-abyss-900: #111A2E;
+  --color-dark-sidebar: #070D18;
+  --color-dark-elevated: #172038;
+  --color-dark-hover: #1C2840;
+  --color-dark-pressed: #213050;
+  --color-dark-border: #1E2D4A;
+  --color-dark-border-strong: #2A3D5E;
 
-  /* Semantic / Status */
-  --color-success: #16a34a;
-  --color-success-bg: #eafbf1;
-  --color-warning: #b45309;
-  --color-warning-bg: #fef3e2;
-  --color-danger: #dc2626;
-  --color-danger-bg: #fef1f1;
-  --color-info: #0284c7;
-  --color-info-bg: #eaf6fe;
+  /* ── Primary — Cobalt (BRAND_GUIDE §2.2) ───────────────────────────────── */
+  --color-cobalt-700: #1B3FBE;      /* button hover/active */
+  --color-cobalt-600: #2554E8;      /* buttons, active nav, links, focus rings */
+  --color-cobalt-500: #3B82F6;
+  --color-cobalt-100: #DCE6FF;      /* selected row highlight, icon tints */
+  --color-cobalt-50: #EEF3FF;       /* hover fill on white surfaces */
 
-  /* Commodity Accent — data encoding only, not UI chrome */
-  --color-metal-gold: #c9962e;
-  --color-metal-copper: #be5f3d;
-  --color-metal-silver: #93a0ad;
-  --color-metal-zinc: #6e7f91;
-  --color-metal-cobalt: #5c7ce0; /* lighter than cobalt-600 so price lines ≠ buttons */
+  /* ── Semantic / Status (BRAND_GUIDE §2.4) ──────────────────────────────── */
+  --color-success: #16A34A;
+  --color-success-bg: #EAFBF1;
+  --color-warning: #B45309;
+  --color-warning-bg: #FEF3E2;
+  --color-danger: #DC2626;
+  --color-danger-bg: #FEF1F1;
+  --color-info: #0284C7;
+  --color-info-bg: #EAF6FE;
 
-  /* Typography */
-  --font-ui: 'Inter', system-ui, sans-serif; /* all in-app text */
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace; /* prices, codes, IDs */
+  /* ── Commodity Accent (BRAND_GUIDE §2.3) ───────────────────────────────── */
+  --color-metal-gold: #C9962E;
+  --color-metal-copper: #BE5F3D;
+  --color-metal-silver: #93A0AD;
+  --color-metal-zinc: #6E7F91;
+  --color-metal-cobalt: #5C7CE0;
 
-  /* Card shadow — §5.1 */
+  /* ── Typography & Shadows ──────────────────────────────────────────────── */
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --shadow-card: 0 1px 2px rgba(15, 23, 41, 0.04), 0 1px 8px rgba(15, 23, 41, 0.03);
   --shadow-modal: 0 20px 60px rgba(15, 23, 41, 0.18), 0 4px 16px rgba(15, 23, 41, 0.1);
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  /* ═════════════════════════════════════════════════════════════════════════
+     SEMANTIC SURFACE TOKENS — LIGHT THEME (default)
+     DASHBOARD_NOTIFICATIONS_DARKMODE_SPEC.md §4.3
+     ═════════════════════════════════════════════════════════════════════════ */
+
+  /* Surfaces */
+  --bg-canvas:        #F5F8FC;   /* canvas-50 */
+  --bg-card:          #FFFFFF;
+  --bg-sidebar:       #16244A;   /* navy-950 */
+  --bg-sidebar-hover: #1E2F5C;   /* navy-900 */
+  --bg-elevated:      #FFFFFF;   /* modals, dropdowns */
+  --bg-hover:         #F5F8FC;   /* canvas-50 reused for hover */
+  --bg-pressed:       #EEF3FF;   /* cobalt-50 */
+
+  /* Borders */
+  --border:           #E4E8EE;   /* slate-200 */
+  --border-strong:    #CBD3DE;   /* slate-300 */
+  --border-sidebar:   #2C4172;   /* navy-700 */
+
+  /* Text */
+  --text-primary:     #0F1729;   /* ink-900 */
+  --text-secondary:   #64748B;   /* slate-500 */
+  --text-tertiary:    #CBD3DE;   /* slate-300 */
+
+  /* Action */
+  --action:           #2554E8;   /* cobalt-600 */
+  --action-hover:     #1B3FBE;   /* cobalt-700 */
+  --action-tint:      #EEF3FF;   /* cobalt-50 */
+  --action-tint-strong: #DCE6FF; /* cobalt-100 */
+
+  /* Header */
+  --header-bg:        #FFFFFF;
+  --header-border:    #E4E8EE;
+
+  /* Semantic status aliases */
+  --success-text:     #16A34A;
+  --success-bg:       #EAFBF1;
+  --warning-text:     #B45309;
+  --warning-bg:       #FEF3E2;
+  --danger-text:      #DC2626;
+  --danger-bg:        #FEF1F1;
+  --info-text:        #0284C7;
+  --info-bg:          #EAF6FE;
+
+  /* ── shadcn/ui mapped directly to brand tokens ────────────────────────── */
+  --background: #F5F8FC;
+  --foreground: #0F1729;
+  --card: #FFFFFF;
+  --card-foreground: #0F1729;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F1729;
+  --primary: #2554E8;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EEF3FF;
+  --secondary-foreground: #1B3FBE;
+  --muted: #F5F8FC;
+  --muted-foreground: #64748B;
+  --accent: #F5F8FC;
+  --accent-foreground: #0F1729;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --input: #E4E8EE;
+  --ring: #2554E8;
+  --radius: 0.5rem;
+  --sidebar: #16244A;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #2554E8;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1E2F5C;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #2C4172;
+  --sidebar-ring: #2554E8;
 }
 
-/* ── Base Styles ───────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   DARK THEME SEMANTIC OVERRIDES
+   DASHBOARD_NOTIFICATIONS_DARKMODE_SPEC.md §4.2 & §4.3
+   ═══════════════════════════════════════════════════════════════════════════ */
+.dark,
+[data-theme="dark"] {
+  /* ── Surfaces ──────────────────────────────────────────────────────────── */
+  --bg-canvas:        #0B1220;   /* abyss-950 — main canvas */
+  --bg-card:          #111A2E;   /* abyss-900 — cards, panels */
+  --bg-sidebar:       #070D18;   /* dark-sidebar — deepest surface */
+  --bg-sidebar-hover: #0F1728;   /* sidebar row hover */
+  --bg-elevated:      #172038;   /* dark-elevated — modals, dropdowns, popovers */
+  --bg-hover:         #1C2840;   /* dark-hover — hover state on cards, table rows */
+  --bg-pressed:       #213050;   /* dark-pressed — pressed/active state */
+
+  /* ── Borders ───────────────────────────────────────────────────────────── */
+  --border:           #1E2D4A;   /* dark-border — card borders, dividers */
+  --border-strong:    #2A3D5E;   /* dark-border-strong — inputs, focus states */
+  --border-sidebar:   #1E2D4A;   /* sidebar dividers */
+
+  /* ── Text ──────────────────────────────────────────────────────────────── */
+  --text-primary:     #E8EDF5;   /* dark-text-primary — body copy, headings */
+  --text-secondary:   #8496BF;   /* dark-text-secondary — muted labels, timestamps */
+  --text-tertiary:    #4D6090;   /* dark-text-tertiary — placeholders, disabled */
+
+  /* ── Action ────────────────────────────────────────────────────────────── */
+  --action:           #2554E8;   /* cobalt-600 — UNCHANGED */
+  --action-hover:     #3D6AEF;   /* cobalt-dark-hover — lighter to maintain contrast */
+  --action-tint:      #0F1E44;   /* cobalt-dark-tint (replaces cobalt-50 in light) */
+  --action-tint-strong: #162248; /* cobalt-dark-tint-strong (replaces cobalt-100) */
+
+  /* ── Semantic — brightened for dark surface legibility ─────────────────── */
+  --success-text:     #34D399;
+  --success-bg:       #0A1F15;
+  --warning-text:     #FBBF24;
+  --warning-bg:       #1F1507;
+  --danger-text:      #F87171;
+  --danger-bg:        #1F0808;
+  --info-text:        #60A5FA;
+  --info-bg:          #091526;
+
+  /* ── Header ────────────────────────────────────────────────────────────── */
+  --header-bg:        #111A2E;   /* abyss-900 */
+  --header-border:    #1E2D4A;   /* dark-border */
+
+  /* ── Raw palette overrides for legacy components using --color-* vars ─── */
+  --color-canvas-50:  #0B1220;   /* abyss-950 */
+  --color-white:      #111A2E;   /* abyss-900 */
+  --color-azure-100:  #172038;   /* dark-elevated */
+  --color-ink-900:    #E8EDF5;   /* dark-text-primary */
+  --color-slate-500:  #8496BF;   /* dark-text-secondary */
+  --color-slate-400:  #8496BF;
+  --color-slate-300:  #4D6090;   /* dark-text-tertiary */
+  --color-slate-200:  #1E2D4A;   /* dark-border */
+
+  --color-cobalt-700: #3D6AEF;   /* cobalt-dark-hover */
+  --color-cobalt-600: #2554E8;   /* cobalt-600 — UNCHANGED */
+  --color-cobalt-100: #162248;   /* cobalt-dark-tint-strong */
+  --color-cobalt-50:  #0F1E44;   /* cobalt-dark-tint */
+
+  --color-success:    #34D399;
+  --color-success-bg: #0A1F15;
+  --color-warning:    #FBBF24;
+  --color-warning-bg: #1F1507;
+  --color-danger:     #F87171;
+  --color-danger-bg:  #1F0808;
+  --color-info:       #60A5FA;
+  --color-info-bg:    #091526;
+
+  --color-navy-950:   #070D18;   /* dark-sidebar */
+  --color-navy-900:   #0F1728;   /* sidebar hover */
+  --color-navy-700:   #1E2D4A;   /* dark-border */
+
+  /* ── shadcn/ui dark overrides ──────────────────────────────────────────── */
+  --background: #0B1220;
+  --foreground: #E8EDF5;
+  --card: #111A2E;
+  --card-foreground: #E8EDF5;
+  --popover: #172038;
+  --popover-foreground: #E8EDF5;
+  --primary: #2554E8;
+  --primary-foreground: #FFFFFF;
+  --secondary: #0F1E44;
+  --secondary-foreground: #E8EDF5;
+  --muted: #1C2840;
+  --muted-foreground: #8496BF;
+  --accent: #1C2840;
+  --accent-foreground: #E8EDF5;
+  --destructive: #F87171;
+  --destructive-foreground: #FFFFFF;
+  --input: #2A3D5E;
+  --border: #1E2D4A;
+  --ring: #2554E8;
+  --sidebar: #070D18;
+  --sidebar-foreground: #E8EDF5;
+  --sidebar-primary: #2554E8;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #0F1728;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #1E2D4A;
+  --sidebar-ring: #2554E8;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TAILWIND v4 @theme — Utility class variable bindings
+   Enables classes like bg-cobalt-600, text-ink-900, bg-navy-950, text-secondary, etc.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@theme {
+  /* Brand Palettes */
+  --color-navy-950: var(--color-navy-950);
+  --color-navy-900: var(--color-navy-900);
+  --color-navy-800: var(--color-navy-800);
+  --color-navy-700: var(--color-navy-700);
+
+  --color-abyss-950: var(--color-abyss-950);
+  --color-abyss-900: var(--color-abyss-900);
+
+  --color-canvas-50: var(--color-canvas-50);
+  --color-azure-100: var(--color-azure-100);
+  --color-ink-900: var(--color-ink-900);
+
+  --color-slate-200: var(--color-slate-200);
+  --color-slate-300: var(--color-slate-300);
+  --color-slate-400: var(--color-slate-400);
+  --color-slate-500: var(--color-slate-500);
+
+  --color-cobalt-50: var(--color-cobalt-50);
+  --color-cobalt-100: var(--color-cobalt-100);
+  --color-cobalt-500: var(--color-cobalt-500);
+  --color-cobalt-600: var(--color-cobalt-600);
+  --color-cobalt-700: var(--color-cobalt-700);
+
+  --color-success: var(--color-success);
+  --color-success-bg: var(--color-success-bg);
+  --color-warning: var(--color-warning);
+  --color-warning-bg: var(--color-warning-bg);
+  --color-danger: var(--color-danger);
+  --color-danger-bg: var(--color-danger-bg);
+  --color-danger-text: var(--danger-text);
+  --color-info: var(--color-info);
+  --color-info-bg: var(--color-info-bg);
+
+  --color-metal-gold: var(--color-metal-gold);
+  --color-metal-copper: var(--color-metal-copper);
+  --color-metal-silver: var(--color-metal-silver);
+  --color-metal-zinc: var(--color-metal-zinc);
+  --color-metal-cobalt: var(--color-metal-cobalt);
+
+  /* Semantic surface & text utility bindings */
+  --color-canvas: var(--bg-canvas);
+  --color-card: var(--bg-card);
+  --color-elevated: var(--bg-elevated);
+  --color-hover: var(--bg-hover);
+  --color-pressed: var(--bg-pressed);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-sidebar: var(--border-sidebar);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+
+  --color-action: var(--action);
+  --color-action-hover: var(--action-hover);
+  --color-action-tint: var(--action-tint);
+  --color-action-tint-strong: var(--action-tint-strong);
+
+  --color-header-bg: var(--header-bg);
+  --color-header-border: var(--header-border);
+
+  /* Shadcn UI bindings */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typography */
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Inter', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* §3 Type scale — in-app tokens */
+  --text-heading-m: 22px;
+  --text-heading-m--line-height: 28px;
+  --text-heading-m--font-weight: 600;
+
+  --text-heading-s: 16px;
+  --text-heading-s--line-height: 24px;
+  --text-heading-s--font-weight: 600;
+
+  --text-body-m: 14px;
+  --text-body-m--line-height: 20px;
+  --text-body-m--font-weight: 400;
+
+  --text-body-s: 13px;
+  --text-body-s--line-height: 18px;
+  --text-body-s--font-weight: 400;
+
+  --text-caption: 11px;
+  --text-caption--line-height: 16px;
+  --text-caption--font-weight: 600;
+  --text-caption--letter-spacing: 0.04em;
+
+  --text-data-m: 14px;
+  --text-data-m--line-height: 20px;
+  --text-data-m--font-weight: 500;
+
+  --text-data-l: 28px;
+  --text-data-l--line-height: 32px;
+  --text-data-l--font-weight: 600;
+
+  /* §5.1 Cards, §5.2 Buttons */
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --radius-badge: 9999px;
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Shadows */
+  --shadow-card: var(--shadow-card);
+  --shadow-modal: var(--shadow-modal);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════════════════════════════════ */
 * {
   box-sizing: border-box;
 }
@@ -102,8 +417,8 @@ body {
   font-family: var(--font-ui);
   font-size: 14px;
   line-height: 1.5;
-  color: var(--color-ink-900);
-  background-color: var(--color-canvas-50);
+  color: var(--text-primary);
+  background-color: var(--bg-canvas);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -115,30 +430,66 @@ body {
 }
 
 /* ── Focus rings ───────────────────────────────────────────────────────────── */
-/* §8.5: visible focus ring on every interactive element.
-   outline: none only allowed if a custom ring replaces it. */
+/* §8.5: visible focus ring on every interactive element — cobalt-600 */
 :focus-visible {
-  outline: 2px solid var(--color-cobalt-600);
+  outline: 2px solid var(--action);
   outline-offset: 2px;
 }
 
-/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   THEME TRANSITIONS & SCROLLBAR
+   DASHBOARD_NOTIFICATIONS_DARKMODE_SPEC.md §4.8 & §4.9
+   ═══════════════════════════════════════════════════════════════════════════ */
+*,
+*::before,
+*::after {
+  transition:
+    background-color 200ms ease,
+    border-color     200ms ease,
+    color            200ms ease,
+    fill             200ms ease,
+    stroke           200ms ease;
+}
+
+.no-theme-transition,
+.no-theme-transition * {
+  transition: none !important;
+}
+
+/* Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-canvas-50);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-slate-200);
+  background: #CBD3DE;   /* slate-300 */
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-slate-300);
+  opacity: 0.8;
 }
 
-/* ── Animations ────────────────────────────────────────────────────────────── */
+.dark ::-webkit-scrollbar-thumb,
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #2A3D5E;   /* dark-border-strong */
+  border-radius: 3px;
+}
+
+/* Hide scrollbar for specific containers but keep functionality */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;            /* Chrome, Safari, Electron */
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════════════════ */
 /* Toast slide-in */
 @keyframes slideIn {
   from {
@@ -169,98 +520,64 @@ body {
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
-/* ── Reduced motion ────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .animate-slide-in,
   .animate-pulse-dot {
     animation: none;
   }
 }
-/* Hide scrollbar for specific containers but keep functionality */
-.no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPONENT UTILITY HELPERS
+   Direct semantic class helpers for components and badges
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Direct semantic text helpers */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+
+/* Direct semantic surface helpers */
+.bg-canvas { background-color: var(--bg-canvas); }
+.bg-card { background-color: var(--bg-card); }
+.bg-elevated { background-color: var(--bg-elevated); }
+.bg-hover { background-color: var(--bg-hover); }
+.bg-pressed { background-color: var(--bg-pressed); }
+.bg-sidebar { background-color: var(--bg-sidebar); }
+.bg-sidebar-hover { background-color: var(--bg-sidebar-hover); }
+
+/* Direct semantic border helpers */
+.border-border { border-color: var(--border); }
+.border-border-strong { border-color: var(--border-strong); }
+.border-sidebar { border-color: var(--border-sidebar); }
+
+/* Status badges — automatically themed via CSS vars (§4.5) */
+.badge-success {
+  background-color: var(--success-bg);
+  color: var(--success-text);
+}
+.badge-warning {
+  background-color: var(--warning-bg);
+  color: var(--warning-text);
+}
+.badge-danger {
+  background-color: var(--danger-bg);
+  color: var(--danger-text);
+}
+.badge-info {
+  background-color: var(--info-bg);
+  color: var(--info-text);
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari and Opera/Electron */
+/* Skeleton loader — auto-themed */
+.skeleton {
+  background-color: var(--border);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@theme inline {
-  --font-heading: var(--font-sans);
-  --font-sans: 'Inter Variable', sans-serif;
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-foreground: var(--foreground);
-  --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
 }
 
 @layer base {

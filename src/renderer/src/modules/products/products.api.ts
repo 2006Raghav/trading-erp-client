@@ -1,6 +1,6 @@
 // src/renderer/src/modules/products/products.api.ts
 import { api } from '../../lib/api'
-import type { Product, ProductCategory, ApiSuccess, ApiSuccessList } from '../../lib/types'
+import type { Product, ProductCategory, ApiError, ApiSuccess, ApiSuccessList } from '../../lib/types'
 
 export interface ProductFilters {
   search?: string
@@ -37,10 +37,11 @@ export const productsApi = {
 
   getById: (id: string) => api.request<ApiSuccess<Product>>('GET', `/products/${id}`),
 
-  create: (data: ProductInput) => api.request<ApiSuccess<Product>>('POST', '/products', data),
+  create: (data: ProductInput) =>
+    api.request<ApiSuccess<Product> | ApiError>('POST', '/products', data),
 
   update: (id: string, data: ProductInput) =>
-    api.request<ApiSuccess<Product>>('PUT', `/products/${id}`, data),
+    api.request<ApiSuccess<Product> | ApiError>('PUT', `/products/${id}`, data),
 
   remove: (id: string) => api.request<{ success: boolean }>('DELETE', `/products/${id}`)
 }

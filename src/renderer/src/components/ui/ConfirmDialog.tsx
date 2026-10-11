@@ -21,7 +21,7 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
-      <p className="text-body-m mb-6" style={{ color: 'var(--color-slate-500)' }}>
+      <p className="text-body-m mb-6" style={{ color: 'var(--text-secondary)' }}>
         {message}
       </p>
       <div className="flex justify-end gap-3">
@@ -32,16 +32,16 @@ export function ConfirmDialog({
             height: '40px',
             padding: '0 16px',
             borderRadius: '8px',
-            border: `1px solid var(--color-slate-200)`,
-            background: 'var(--color-white)',
-            color: 'var(--color-ink-900)',
+            border: `1px solid var(--border)`,
+            background: 'var(--bg-card)',
+            color: 'var(--text-primary)',
             cursor: 'pointer'
           }}
           onMouseEnter={(e) => {
-            ;(e.currentTarget as HTMLElement).style.background = 'var(--color-canvas-50)'
+            ;(e.currentTarget as HTMLElement).style.background = 'var(--bg-hover)'
           }}
           onMouseLeave={(e) => {
-            ;(e.currentTarget as HTMLElement).style.background = 'var(--color-white)'
+            ;(e.currentTarget as HTMLElement).style.background = 'var(--bg-card)'
           }}
         >
           Cancel
@@ -57,18 +57,18 @@ export function ConfirmDialog({
             padding: '0 16px',
             borderRadius: '8px',
             border: 'none',
-            background: danger ? 'var(--color-danger)' : 'var(--color-cobalt-600)',
+            background: danger ? 'var(--danger-text)' : 'var(--action)',
             cursor: 'pointer'
           }}
           onMouseEnter={(e) => {
             ;(e.currentTarget as HTMLElement).style.background = danger
-              ? '#B91C1C'
-              : 'var(--color-cobalt-700)'
+              ? 'var(--danger-text)'
+              : 'var(--action-hover)'
           }}
           onMouseLeave={(e) => {
             ;(e.currentTarget as HTMLElement).style.background = danger
-              ? 'var(--color-danger)'
-              : 'var(--color-cobalt-600)'
+              ? 'var(--danger-text)'
+              : 'var(--action)'
           }}
         >
           {confirmLabel}

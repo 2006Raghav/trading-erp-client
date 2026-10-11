@@ -38,7 +38,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
         style={{
           maxWidth: MAX_WIDTHS[size],
           maxHeight: '90vh',
-          background: 'var(--color-white)',
+          background: 'var(--bg-elevated)',
           borderRadius: '12px',
           boxShadow: 'var(--shadow-modal)'
         }}
@@ -48,10 +48,10 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
           className="flex items-center justify-between px-6 shrink-0"
           style={{
             height: '56px',
-            borderBottom: `1px solid var(--color-slate-200)`
+            borderBottom: `1px solid var(--border)`
           }}
         >
-          <h3 className="text-heading-s" style={{ color: 'var(--color-ink-900)' }}>
+          <h3 className="text-heading-s" style={{ color: 'var(--text-primary)' }}>
             {title}
           </h3>
           <button
@@ -61,18 +61,18 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
               width: 32,
               height: 32,
               borderRadius: '8px',
-              color: 'var(--color-slate-500)',
+              color: 'var(--text-secondary)',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer'
             }}
             onMouseEnter={(e) => {
-              ;(e.currentTarget as HTMLElement).style.background = 'var(--color-canvas-50)'
-              ;(e.currentTarget as HTMLElement).style.color = 'var(--color-ink-900)'
+              ;(e.currentTarget as HTMLElement).style.background = 'var(--bg-hover)'
+              ;(e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'
             }}
             onMouseLeave={(e) => {
               ;(e.currentTarget as HTMLElement).style.background = 'transparent'
-              ;(e.currentTarget as HTMLElement).style.color = 'var(--color-slate-500)'
+              ;(e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)'
             }}
           >
             <X size={16} strokeWidth={1.5} />

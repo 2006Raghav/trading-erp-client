@@ -34,7 +34,7 @@ export function RequestForm() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const [form, setForm] = useState<CommodityRequestInput>({
-    categoryId: prefill?.categoryId ?? '',
+    categoryId: prefill?.typeId ?? '',
 
     quantity: 0,
     quantityUnit: prefill?.standardUnit ?? 'MT',

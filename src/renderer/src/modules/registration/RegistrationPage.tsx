@@ -703,7 +703,7 @@ export function RegistrationPage() {
                   onValueChange={(value) => changeRegistrationType(value as RegistrationType)}
                   className="mt-3"
                 >
-                  <TabsList className="grid h-auto grid-cols-3 rounded-lg border border-[var(--color-slate-200)] bg-white p-1">
+                  <TabsList className="grid h-auto grid-cols-3 rounded-lg border border-[var(--border)] bg-[var(--bg-canvas)] p-1">
                     {(Object.keys(TYPE_META) as RegistrationType[]).map((type) => {
                       const meta = TYPE_META[type]
 
@@ -714,7 +714,7 @@ export function RegistrationPage() {
                           key={type}
                           value={type}
                           disabled={step !== 1}
-                          className="min-h-[64px] gap-2 rounded-md text-sm text-[var(--color-slate-500)] data-[state=active]:bg-[var(--color-cobalt-50)] data-[state=active]:text-[var(--color-cobalt-700)]"
+                          className="min-h-[64px] gap-2 rounded-md text-sm text-[var(--text-secondary)] data-[state=active]:bg-[var(--action-tint)] data-[state=active]:text-[var(--action-hover)]"
                         >
                           <Icon className="h-4 w-4" strokeWidth={1.7} />
 
@@ -725,7 +725,7 @@ export function RegistrationPage() {
                   </TabsList>
                 </Tabs>
 
-                <p className="mt-2 text-xs text-[var(--color-slate-500)]">
+                <p className="mt-2 text-xs text-[var(--text-secondary)]">
                   {TYPE_META[registrationType].description}
                 </p>
               </div>
@@ -733,7 +733,7 @@ export function RegistrationPage() {
 
             {/* CONTENT CARD */}
 
-            <Card className="mt-6 border-[var(--color-slate-200)] bg-white shadow-sm">
+            <Card className="mt-6 border-[var(--border)] shadow-sm">
               <CardContent className="p-6 sm:p-8">
                 {/* STEP 1 */}
 
@@ -998,7 +998,7 @@ export function RegistrationPage() {
                                       {...field}
                                       rows={4}
                                       placeholder="Describe the parties, commodities, territories, or transaction scope you represent."
-                                      className="flex w-full rounded-md border border-[var(--color-slate-200)] bg-white px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-[var(--color-slate-500)] focus-visible:border-[var(--color-cobalt-600)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-cobalt-100)]"
+                                      className="flex w-full rounded-md border border-[var(--border)] bg-[var(--bg-canvas)] px-3 py-2 text-sm text-[var(--text-primary)] shadow-sm transition-colors placeholder:text-[var(--text-tertiary)] focus-visible:border-[var(--action)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--action-tint-strong)]"
                                     />
                                   </FormControl>
 
@@ -1037,11 +1037,11 @@ export function RegistrationPage() {
 
                       {/* ACTION */}
 
-                      <div className="flex justify-end border-t border-[var(--color-slate-200)] pt-6">
+                      <div className="flex justify-end border-t border-[var(--border)] pt-6">
                         <Button
                           type="submit"
                           disabled={submitting}
-                          className="h-11 rounded-md bg-[var(--color-cobalt-600)] px-6 font-semibold text-white hover:bg-[var(--color-cobalt-700)] focus-visible:ring-2 focus-visible:ring-[var(--color-cobalt-600)] focus-visible:ring-offset-2"
+                          className="h-11 rounded-md bg-[var(--action)] px-6 font-semibold text-white hover:bg-[var(--action-hover)] focus-visible:ring-2 focus-visible:ring-[var(--action)] focus-visible:ring-offset-2"
                         >
                           {submitting ? (
                             <>
@@ -1133,7 +1133,7 @@ function StepIndicator({ step }: { step: Step }) {
             {index !== 0 && (
               <div
                 className={`absolute left-0 right-1/2 top-4 -translate-x-1/2 border-t ${
-                  completed ? 'border-[var(--color-cobalt-600)]' : 'border-[var(--color-slate-200)]'
+                  completed ? 'border-[var(--action)]' : 'border-[var(--border)]'
                 }`}
               />
             )}
@@ -1144,10 +1144,10 @@ function StepIndicator({ step }: { step: Step }) {
                   'flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold',
 
                   completed
-                    ? 'border-[var(--color-cobalt-600)] bg-[var(--color-cobalt-600)] text-white'
+                    ? 'border-[var(--action)] bg-[var(--action)] text-white'
                     : active
-                      ? 'border-[var(--color-cobalt-600)] bg-[var(--color-cobalt-50)] text-[var(--color-cobalt-700)]'
-                      : 'border-[var(--color-slate-200)] bg-white text-[var(--color-slate-500)]'
+                      ? 'border-[var(--action)] bg-[var(--action-tint)] text-[var(--action-hover)]'
+                      : 'border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-secondary)]'
                 ].join(' ')}
               >
                 {completed ? <CheckCircle2 className="h-4 w-4" /> : number}
@@ -1156,14 +1156,14 @@ function StepIndicator({ step }: { step: Step }) {
               <span
                 className={`mt-2 text-xs font-semibold ${
                   active || completed
-                    ? 'text-[var(--color-ink-900)]'
-                    : 'text-[var(--color-slate-500)]'
+                    ? 'text-[var(--text-primary)]'
+                    : 'text-[var(--text-secondary)]'
                 }`}
               >
                 {title}
               </span>
 
-              <span className="mt-0.5 hidden text-[10px] text-[var(--color-slate-500)] sm:block">
+              <span className="mt-0.5 hidden text-[10px] text-[var(--text-secondary)] sm:block">
                 {description}
               </span>
             </div>
@@ -1186,9 +1186,9 @@ function FormSection({
   return (
     <section className="space-y-5">
       <div>
-        <h3 className="text-base font-semibold text-[var(--color-ink-900)]">{title}</h3>
+        <h3 className="text-base font-semibold text-[var(--text-primary)]">{title}</h3>
 
-        <p className="mt-1 text-xs leading-5 text-[var(--color-slate-500)]">{description}</p>
+        <p className="mt-1 text-xs leading-5 text-[var(--text-secondary)]">{description}</p>
       </div>
 
       {children}
@@ -1215,7 +1215,7 @@ function Field({
       name={name}
       render={({ field }: any) => (
         <FormItem>
-          <FormLabel className="text-xs text-[var(--color-slate-500)]">{label}</FormLabel>
+          <FormLabel className="text-xs text-[var(--text-secondary)]">{label}</FormLabel>
 
           <FormControl>
             <Input
@@ -1223,11 +1223,11 @@ function Field({
               type={type}
               value={field.value ?? ''}
               placeholder={placeholder}
-              className="border-[var(--color-slate-200)] focus-visible:border-[var(--color-cobalt-600)] focus-visible:ring-[var(--color-cobalt-100)]"
+              className="border-[var(--border)] focus-visible:border-[var(--action)] focus-visible:ring-[var(--action-tint)]"
             />
           </FormControl>
 
-          <FormMessage className="text-xs text-[var(--color-danger)]" />
+          <FormMessage className="text-xs text-[var(--danger-text)]" />
         </FormItem>
       )}
     />
@@ -1253,7 +1253,7 @@ function PasswordField({
       name={name}
       render={({ field }: any) => (
         <FormItem>
-          <FormLabel className="text-xs text-[var(--color-slate-500)]">{label}</FormLabel>
+          <FormLabel className="text-xs text-[var(--text-secondary)]">{label}</FormLabel>
 
           <FormControl>
             <div className="relative">
@@ -1261,21 +1261,21 @@ function PasswordField({
                 {...field}
                 type={show ? 'text' : 'password'}
                 placeholder="Minimum 8 characters"
-                className="border-[var(--color-slate-200)] pr-10 focus-visible:border-[var(--color-cobalt-600)] focus-visible:ring-[var(--color-cobalt-100)]"
+                className="border-[var(--border)] pr-10 focus-visible:border-[var(--action)] focus-visible:ring-[var(--action-tint)]"
               />
 
               <button
                 type="button"
                 onClick={onToggle}
                 aria-label={show ? 'Hide password' : 'Show password'}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-slate-500)] hover:text-[var(--color-ink-900)] focus:outline-none focus:ring-2 focus:ring-[var(--color-cobalt-600)]"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--action)]"
               >
                 {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
           </FormControl>
 
-          <FormMessage className="text-xs text-[var(--color-danger)]" />
+          <FormMessage className="text-xs text-[var(--danger-text)]" />
         </FormItem>
       )}
     />
@@ -1285,18 +1285,18 @@ function PasswordField({
 function ConfirmationStep({ email, onStatus }: { email: string; onStatus: () => void }) {
   return (
     <div className="py-10 text-center">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-success-bg)] text-[var(--color-success)]">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[var(--success-bg)] text-[var(--success-text)]">
         <CheckCircle2 className="h-7 w-7" />
       </div>
 
-      <h3 className="mt-6 text-2xl font-semibold">Application Received</h3>
+      <h3 className="mt-6 text-2xl font-semibold text-[var(--text-primary)]">Application Received</h3>
 
-      <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[var(--color-slate-500)]">
+      <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-[var(--text-secondary)]">
         Your registration is under review. We typically respond within 1–2 business days.
       </p>
 
       {email && (
-        <p className="mt-3 text-sm text-[var(--color-ink-900)]">
+        <p className="mt-3 text-sm text-[var(--text-primary)]">
           You will be contacted at <span className="font-semibold">{email}</span>.
         </p>
       )}
@@ -1305,14 +1305,14 @@ function ConfirmationStep({ email, onStatus }: { email: string; onStatus: () => 
         <Button
           type="button"
           onClick={onStatus}
-          className="bg-[var(--color-cobalt-600)] text-white hover:bg-[var(--color-cobalt-700)]"
+          className="bg-[var(--action)] text-white hover:bg-[var(--action-hover)]"
         >
           Check Application Status
           <ChevronRight className="ml-2 h-4 w-4" />
         </Button>
       </div>
 
-      <p className="mt-6 text-xs text-[var(--color-slate-500)]">
+      <p className="mt-6 text-xs text-[var(--text-secondary)]">
         Your account remains inactive until KYC approval.
       </p>
     </div>

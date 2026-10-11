@@ -1,6 +1,6 @@
 // src/main/index.ts
 
-import { app, BrowserWindow, shell, protocol, net } from 'electron'
+import { app, BrowserWindow, shell, protocol, net, ipcMain } from 'electron'
 import path from 'path'
 import { pathToFileURL } from 'url'
 
@@ -9,7 +9,7 @@ protocol.registerSchemesAsPrivileged([
     scheme: 'app',
     privileges: {
       secure: true, // treated as HTTPS-equivalent (enables fetch, Service Workers)
-      standard: true, // URL parsing follows standard rules → origin = app://trading-erp
+      standard: true,
       supportFetchAPI: true, // fetch() calls work from within this scheme
       corsEnabled: true // this scheme participates in standard CORS negotiation
     }
@@ -23,6 +23,7 @@ function createWindow(): void {
     minWidth: 1100,
     minHeight: 700,
     title: 'Xclamation ERP',
+    icon: path.join(app.getAppPath(), 'assets/icon.png'),
     webPreferences: {
       // preload.js runs in a privileged context between Node and the web page.
       // It can use Electron APIs and expose a safe, limited surface to the renderer.
@@ -57,6 +58,15 @@ function createWindow(): void {
 
 // Wait for Electron to be ready before creating the window.
 app.whenReady().then(() => {
+  ipcMain.handle('window:focus', () => {
+    const win = BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0]
+    if (!win) return
+
+    if (win.isMinimized()) win.restore()
+    if (!win.isVisible()) win.show()
+    win.focus()
+  })
+
   // ── Serve renderer files through the app:// protocol ────────────────
   // Maps  app://trading-erp/<path>  →  dist/renderer/<path>
   // HashRouter means all actual routing is in the URL hash (#/login, #/dashboard),

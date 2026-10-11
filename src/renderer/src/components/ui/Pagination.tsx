@@ -17,19 +17,19 @@ export function Pagination({ meta, onPageChange }: PaginationProps) {
     minWidth: '32px',
     padding: '0 10px',
     borderRadius: '8px',
-    border: `1px solid var(--color-slate-200)`,
-    background: 'var(--color-white)',
+    border: `1px solid var(--border)`,
+    background: 'var(--bg-card)',
     fontSize: '13px',
-    color: 'var(--color-ink-900)',
+    color: 'var(--text-primary)',
     cursor: 'pointer'
   }
 
   return (
     <div
       className="flex items-center justify-between px-4 py-3"
-      style={{ borderTop: `1px solid var(--color-slate-200)` }}
+      style={{ borderTop: `1px solid var(--border)` }}
     >
-      <span className="text-body-s" style={{ color: 'var(--color-slate-500)' }}>
+      <span className="text-body-s" style={{ color: 'var(--text-secondary)' }}>
         Showing{' '}
         <span className="font-mono">
           {start}–{end}
@@ -48,7 +48,7 @@ export function Pagination({ meta, onPageChange }: PaginationProps) {
         >
           ‹ Prev
         </button>
-        <span className="text-body-s font-medium" style={{ color: 'var(--color-ink-900)' }}>
+        <span className="text-body-s font-medium" style={{ color: 'var(--text-primary)' }}>
           {page} / {totalPages}
         </span>
         <button

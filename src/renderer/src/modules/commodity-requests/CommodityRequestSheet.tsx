@@ -77,12 +77,33 @@ export function CommodityRequestSheet({
     notes: ''
   })
 
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('')
+  const [types, setTypes] = useState<any[]>([])
+  const [typesLoading, setTypesLoading] = useState(false)
+
+  useEffect(() => {
+    if (!selectedCategoryId) {
+      setTypes([])
+      return
+    }
+    
+    setTypesLoading(true)
+    // We need to fetch from marketplaceApi.getTypesByCategory
+    import('../marketplace/marketplace.api').then(({ marketplaceApi }) => {
+      marketplaceApi.getTypesByCategory(selectedCategoryId)
+        .then(res => {
+          if (res.success) setTypes(res.data)
+        })
+        .finally(() => setTypesLoading(false))
+    })
+  }, [selectedCategoryId])
+
   useEffect(() => {
     if (!product) return
 
     setForm((prev) => ({
       ...prev,
-      categoryId: product.categoryId,
+      categoryId: product.categoryId ?? '',
       quantityUnit: product.quantityUnit,
       purityRequired: product.purity,
       gradeRequired: product.grade,
@@ -163,6 +184,8 @@ export function CommodityRequestSheet({
     if (!open) {
       setErrors({})
       setSaving(false)
+      setSelectedCategoryId('')
+      setTypes([])
 
       setForm({
         categoryId: product?.categoryId ?? '',
@@ -243,15 +266,18 @@ export function CommodityRequestSheet({
                 </CardTitle>
               </CardHeader>
 
-              <CardContent>
+              <CardContent className="grid gap-5 md:grid-cols-2">
                 <div>
                   <Label>
                     Commodity Category <span className="text-destructive">*</span>
                   </Label>
 
                   <Select
-                    value={form.categoryId}
-                    onValueChange={(value) => setField('categoryId', value)}
+                    value={selectedCategoryId}
+                    onValueChange={(value) => {
+                      setSelectedCategoryId(value)
+                      setField('categoryId', '') // reset type
+                    }}
                   >
                     <SelectTrigger className="mt-2">
                       <SelectValue placeholder="Select commodity category" />
@@ -261,6 +287,30 @@ export function CommodityRequestSheet({
                       {categories.map((category) => (
                         <SelectItem key={category.id} value={category.id}>
                           {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label>
+                    Commodity Type <span className="text-destructive">*</span>
+                  </Label>
+
+                  <Select
+                    value={form.categoryId}
+                    onValueChange={(value) => setField('categoryId', value)}
+                    disabled={!selectedCategoryId || typesLoading}
+                  >
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder={typesLoading ? "Loading..." : "Select commodity type"} />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      {types.map((type) => (
+                        <SelectItem key={type.id} value={type.id}>
+                          {type.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

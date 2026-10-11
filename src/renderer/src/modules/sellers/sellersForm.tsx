@@ -128,10 +128,10 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
       height: '40px',
       fontSize: '14px',
       lineHeight: '20px',
-      border: `1px solid ${hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'}`,
+      border: `1px solid ${hasError ? 'var(--danger-text)' : 'var(--border)'}`,
       borderRadius: '8px',
-      background: hasError ? 'var(--color-danger-bg)' : 'var(--color-white)',
-      color: 'var(--color-ink-900)',
+      background: hasError ? 'var(--danger-bg)' : 'var(--bg-canvas)',
+      color: 'var(--text-primary)',
       outline: 'none',
       fontFamily: 'var(--font-ui)'
     }
@@ -140,15 +140,15 @@ export function SellerForm({ seller, onSuccess, onCancel }: Props) {
   function onFocus(
     e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) {
-    e.target.style.borderColor = 'var(--color-cobalt-600)'
-    e.target.style.boxShadow = '0 0 0 2px var(--color-cobalt-100)'
+    e.target.style.borderColor = 'var(--action)'
+    e.target.style.boxShadow = '0 0 0 2px var(--action-tint-strong)'
   }
 
   function onBlur(
     e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
     hasError: boolean
   ) {
-    e.target.style.borderColor = hasError ? 'var(--color-danger)' : 'var(--color-slate-200)'
+    e.target.style.borderColor = hasError ? 'var(--danger-text)' : 'var(--border)'
     e.target.style.boxShadow = ''
   }
 
