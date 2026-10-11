@@ -2,7 +2,7 @@ export const primaryBtnStyle: React.CSSProperties = {
   height: '40px',
   padding: '0 24px',
   borderRadius: '8px',
-  background: 'var(--color-cobalt-600)',
+  background: 'var(--action)',
   color: '#fff',
   fontSize: '14px',
   fontWeight: 600,
@@ -16,13 +16,13 @@ export const labelStyle: React.CSSProperties = {
   fontWeight: 600,
   letterSpacing: '0.04em',
   textTransform: 'uppercase',
-  color: 'var(--color-slate-500)',
+  color: 'var(--text-secondary)',
   marginBottom: '6px'
 }
 
 export const errorStyle: React.CSSProperties = {
   fontSize: '13px',
-  color: 'var(--color-danger)',
+  color: 'var(--danger-text)',
   marginTop: '4px'
 }
 
@@ -30,11 +30,11 @@ export const cancelBtnStyle: React.CSSProperties = {
   height: '40px',
   padding: '0 16px',
   borderRadius: '8px',
-  background: 'var(--color-white)',
-  color: 'var(--color-ink-900)',
+  background: 'var(--bg-card)',
+  color: 'var(--text-primary)',
   fontSize: '14px',
   fontWeight: 500,
-  border: '1px solid var(--color-slate-200)',
+  border: '1px solid var(--border)',
   cursor: 'pointer'
 }
 
@@ -43,6 +43,6 @@ export const sectionHeadingStyle: React.CSSProperties = {
   fontWeight: 600,
   letterSpacing: '0.04em',
   textTransform: 'uppercase',
-  color: 'var(--color-slate-500)',
+  color: 'var(--text-secondary)',
   marginBottom: '12px'
 }
