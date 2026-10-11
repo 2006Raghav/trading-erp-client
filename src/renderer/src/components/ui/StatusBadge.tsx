@@ -11,13 +11,13 @@ export function CreditBadge({ rating }: { rating: string | null }) {
   const s = CREDIT_STYLES[r] ?? CREDIT_STYLES.Unrated
   return (
     <span
-      className="inline-flex items-center text-caption uppercase"
+      className="inline-flex items-center justify-center text-caption uppercase text-center font-semibold leading-none"
       style={{
         background: s.bg,
         color: s.text,
-        padding: '2px 10px',
+        padding: '3px 10px',
         borderRadius: '9999px',
-        lineHeight: '16px'
+        lineHeight: '1'
       }}
     >
       {r}
@@ -29,27 +29,27 @@ export function CreditBadge({ rating }: { rating: string | null }) {
 export function ActiveBadge({ isActive }: { isActive: boolean }) {
   return (
     <span
-      className="inline-flex items-center gap-1.5 text-caption uppercase"
+      className="inline-flex items-center justify-center gap-1.5 text-caption uppercase font-semibold leading-none"
       style={{
         background: isActive ? 'var(--color-success-bg)' : 'var(--color-canvas-50)',
         color: isActive ? 'var(--color-success)' : 'var(--color-slate-500)',
-        padding: '2px 10px',
+        padding: '3px 10px',
         borderRadius: '9999px',
-        lineHeight: '16px'
+        lineHeight: '1'
       }}
     >
       {/* §5.6: status dot — always paired with a word */}
       <span
         className={isActive ? 'animate-pulse-dot' : ''}
         style={{
-          width: 8,
-          height: 8,
+          width: 6,
+          height: 6,
           borderRadius: '50%',
           display: 'inline-block',
           background: isActive ? 'var(--color-success)' : 'var(--color-slate-300)'
         }}
       />
-      {isActive ? 'Active' : 'Inactive'}
+      <span>{isActive ? 'Active' : 'Inactive'}</span>
     </span>
   )
 }
@@ -96,25 +96,25 @@ export function KycStatusBadge({ status }: { status: KycStatus | null }) {
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 text-caption uppercase"
+      className="inline-flex items-center justify-center gap-1.5 text-caption uppercase font-semibold leading-none"
       style={{
         background: s.bg,
         color: s.text,
-        padding: '2px 10px',
+        padding: '3px 10px',
         borderRadius: '9999px',
-        lineHeight: '16px'
+        lineHeight: '1'
       }}
     >
       <span
         style={{
-          width: 8,
-          height: 8,
+          width: 6,
+          height: 6,
           borderRadius: '50%',
           display: 'inline-block',
           background: s.text
         }}
       />
-      {s.label}
+      <span>{s.label}</span>
     </span>
   )
 }
@@ -123,13 +123,13 @@ export function KycStatusBadge({ status }: { status: KycStatus | null }) {
 export function RoleBadge({ role }: { role: string }) {
   return (
     <span
-      className="inline-flex items-center text-caption uppercase"
+      className="inline-flex items-center justify-center text-caption uppercase font-semibold leading-none text-center"
       style={{
         background: 'var(--color-cobalt-100)',
         color: 'var(--color-cobalt-700)',
-        padding: '2px 10px',
+        padding: '3px 10px',
         borderRadius: '9999px',
-        lineHeight: '16px'
+        lineHeight: '1'
       }}
     >
       {role}
@@ -151,25 +151,25 @@ export function SemanticBadge({ state, label }: { state: SemanticState; label: s
   const s = SEMANTIC_STYLES[state]
   return (
     <span
-      className="inline-flex items-center gap-1.5 text-caption uppercase"
+      className="inline-flex items-center justify-center gap-1.5 text-caption uppercase font-semibold leading-none"
       style={{
         background: s.bg,
         color: s.text,
-        padding: '2px 10px',
+        padding: '3px 10px',
         borderRadius: '9999px',
-        lineHeight: '16px'
+        lineHeight: '1'
       }}
     >
       <span
         style={{
-          width: 8,
-          height: 8,
+          width: 6,
+          height: 6,
           borderRadius: '50%',
           display: 'inline-block',
           background: s.text
         }}
       />
-      {label}
+      <span>{label}</span>
     </span>
   )
 }

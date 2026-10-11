@@ -89,10 +89,10 @@ export function Sidebar() {
             className="flex items-center justify-center rounded-btn text-white text-xs font-bold shrink-0"
             style={{ width: 32, height: 32, background: 'var(--action)' }}
           >
-            CE
+            !
           </div>
           <div>
-            <p className="text-white font-semibold text-body-m leading-tight">Commodity ERP</p>
+            <p className="text-white font-semibold text-body-m leading-tight">Xclamation</p>
             {/* §4.2: sidebar default text → dark-text-secondary (#8496BF) in dark */}
             <p
               className="text-caption uppercase tracking-widest"

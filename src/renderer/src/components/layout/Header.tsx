@@ -71,7 +71,7 @@ export function Header() {
   const title =
     PAGE_TITLES[location.pathname] ??
     Object.entries(PAGE_TITLES).find(([k]) => location.pathname.startsWith(k))?.[1] ??
-    'Commodity ERP'
+    'Xclamation'
 
   const [isNotifOpen, setIsNotifOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
@@ -108,7 +108,6 @@ export function Header() {
       className="flex items-center shrink-0 justify-between px-6"
       style={{
         height: '56px',
-        // §1.2 — header-bg: white (light) / abyss-900 (dark) via CSS var
         background: 'var(--header-bg)',
         borderBottom: '1px solid var(--header-border)',
         // Explicit transition for header surface — supplements global transition

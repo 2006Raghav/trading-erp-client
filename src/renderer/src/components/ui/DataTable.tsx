@@ -91,8 +91,8 @@ export function DataTable<T extends { id?: string }>({
         <thead>
           <tr
             style={{
-              background: 'var(--color-canvas-50)',
-              borderBottom: `1px solid var(--color-slate-200)`
+              background: 'var(--bg-canvas)',
+              borderBottom: `1px solid var(--border)`
             }}
           >
             {columns.map((col) => (
@@ -101,7 +101,7 @@ export function DataTable<T extends { id?: string }>({
                 className="text-caption uppercase px-4 text-left"
                 style={{
                   height: '40px',
-                  color: 'var(--color-slate-500)',
+                  color: 'var(--text-secondary)',
                   textAlign: col.numeric ? 'right' : 'left',
                   width: col.width ?? undefined
                 }}
@@ -120,15 +120,15 @@ export function DataTable<T extends { id?: string }>({
               className="transition-colors"
               style={{
                 height: `${rowHeight}px`,
-                borderBottom: `1px solid var(--color-slate-200)`,
-                background: 'var(--color-white)',
+                borderBottom: `1px solid var(--border)`,
+                background: 'var(--bg-card)',
                 cursor: onRowClick ? 'pointer' : undefined
               }}
               onMouseEnter={(e) => {
-                ;(e.currentTarget as HTMLElement).style.background = 'var(--color-canvas-50)'
+                ;(e.currentTarget as HTMLElement).style.background = 'var(--bg-hover)'
               }}
               onMouseLeave={(e) => {
-                ;(e.currentTarget as HTMLElement).style.background = 'var(--color-white)'
+                ;(e.currentTarget as HTMLElement).style.background = 'var(--bg-card)'
               }}
             >
               {columns.map((col) => {
@@ -142,7 +142,7 @@ export function DataTable<T extends { id?: string }>({
                       padding: '0 16px',
                       fontSize: '14px',
                       lineHeight: '20px',
-                      color: 'var(--color-ink-900)',
+                      color: 'var(--text-primary)',
                       textAlign: col.numeric ? 'right' : 'left'
                     }}
                   >
