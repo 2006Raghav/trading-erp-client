@@ -37,10 +37,10 @@ export function LoginPage() {
     padding: '10px 12px',
     fontSize: '14px',
     lineHeight: '20px',
-    border: `1px solid var(--color-slate-200)`,
+    border: `1px solid var(--border)`,
     borderRadius: '8px',
-    color: 'var(--color-ink-900)',
-    background: 'var(--color-white)',
+    color: 'var(--text-primary)',
+    background: 'var(--bg-canvas)',
     outline: 'none',
     fontFamily: 'var(--font-ui)'
   }
@@ -48,14 +48,14 @@ export function LoginPage() {
   return (
     <div
       className="min-h-screen flex items-center justify-center"
-      style={{ background: 'var(--color-navy-950)' }}
+      style={{ background: 'var(--bg-sidebar)' }}
     >
       {/* Card */}
       <div
-        className="w-full"
+        className="w-full border border-[var(--border)]"
         style={{
           maxWidth: '400px',
-          background: 'var(--color-white)',
+          background: 'var(--bg-card)',
           borderRadius: '12px',
           boxShadow: 'var(--shadow-modal)',
           padding: '40px'
@@ -69,18 +69,18 @@ export function LoginPage() {
               width: 48,
               height: 48,
               borderRadius: '12px',
-              background: 'var(--color-cobalt-600)',
+              background: 'var(--action)',
               fontSize: '16px'
             }}
           >
-            CE
+            !
           </div>
-          <h2 className="text-heading-m" style={{ color: 'var(--color-ink-900)' }}>
-            Commodity ERP
+          <h2 className="text-heading-m" style={{ color: 'var(--text-primary)' }}>
+            Xclamation
           </h2>
           <p
             className="text-caption uppercase tracking-widest mt-1"
-            style={{ color: 'var(--color-slate-500)' }}
+            style={{ color: 'var(--text-secondary)' }}
           >
             Enterprise Commodity Trading
           </p>
@@ -92,9 +92,9 @@ export function LoginPage() {
             <div
               className="mb-4 px-4 py-3 rounded-btn text-body-s"
               style={{
-                background: 'var(--color-danger-bg)',
-                color: 'var(--color-danger)',
-                border: `1px solid var(--color-danger)`
+                background: 'var(--danger-bg)',
+                color: 'var(--danger-text)',
+                border: `1px solid var(--danger-text)`
               }}
             >
               {error}
@@ -103,17 +103,20 @@ export function LoginPage() {
 
           <div className="space-y-4">
             {' '}
-            <h1 className="text-2xl font-bold text-ink-900 mb-1">Sign in</h1>
-            <p className="text-slate-500 text-sm mb-8">
+            <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Sign in</h1>
+            <p className="text-[var(--text-secondary)] text-sm mb-8">
               Don't have an account?{' '}
-              <Link to="/register" className="text-cobalt-600 hover:text-cobalt-700 font-medium">
+              <Link
+                to="/register"
+                className="text-[var(--action)] hover:text-[var(--action-hover)] font-medium"
+              >
                 Register
               </Link>
             </p>
             <div>
               <label
                 className="block text-caption uppercase mb-1.5"
-                style={{ color: 'var(--color-slate-500)' }}
+                style={{ color: 'var(--text-secondary)' }}
               >
                 Username or Email
               </label>
@@ -126,17 +129,17 @@ export function LoginPage() {
                 autoFocus
                 autoComplete="username"
                 onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--color-cobalt-600)'
+                  e.target.style.borderColor = 'var(--action)'
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--color-slate-200)'
+                  e.target.style.borderColor = 'var(--border)'
                 }}
               />
             </div>
             <div>
               <label
                 className="block text-caption uppercase mb-1.5"
-                style={{ color: 'var(--color-slate-500)' }}
+                style={{ color: 'var(--text-secondary)' }}
               >
                 Password
               </label>
@@ -151,10 +154,10 @@ export function LoginPage() {
                   }}
                   autoComplete="current-password"
                   onFocus={(e) => {
-                    e.target.style.borderColor = 'var(--color-cobalt-600)'
+                    e.target.style.borderColor = 'var(--action)'
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = 'var(--color-slate-200)'
+                    e.target.style.borderColor = 'var(--border)'
                   }}
                 />
 
@@ -171,7 +174,7 @@ export function LoginPage() {
                     background: 'transparent',
                     padding: '4px',
                     cursor: 'pointer',
-                    color: 'var(--color-slate-500)',
+                    color: 'var(--text-secondary)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
@@ -188,18 +191,17 @@ export function LoginPage() {
               style={{
                 height: '40px',
                 borderRadius: '8px',
-                background: loading ? 'var(--color-cobalt-700)' : 'var(--color-cobalt-600)',
+                background: loading ? 'var(--action-hover)' : 'var(--action)',
                 opacity: loading ? 0.7 : 1,
                 cursor: loading ? 'not-allowed' : 'pointer',
                 border: 'none'
               }}
               onMouseEnter={(e) => {
                 if (!loading)
-                  (e.currentTarget as HTMLElement).style.background = 'var(--color-cobalt-700)'
+                  (e.currentTarget as HTMLElement).style.background = 'var(--action-hover)'
               }}
               onMouseLeave={(e) => {
-                if (!loading)
-                  (e.currentTarget as HTMLElement).style.background = 'var(--color-cobalt-600)'
+                if (!loading) (e.currentTarget as HTMLElement).style.background = 'var(--action)'
               }}
             >
               {loading ? 'Signing in…' : 'Sign In'}
